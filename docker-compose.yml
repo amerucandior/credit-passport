@@ -1,0 +1,1 @@
+docker run --name postgres17  -e POSTGRES_USER=finance  -e POSTGRES_PASSWORD=Pass  -e POSTGRES_DB=mydb  -p 5432:5432  -d postgres:17
