@@ -7,10 +7,14 @@ import com.passport.creditpassport.auth.Dto.RegisterRequest;
 import com.passport.creditpassport.auth.models.user;
 import com.passport.creditpassport.auth.repository.UsersRepository;
 import com.passport.creditpassport.auth.service.AuthService;
+import com.passport.creditpassport.config.JwtService;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+
 
 
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -29,7 +34,9 @@ public class AuthServiceImpl implements AuthService {
         users.setNatId(request.getUserNationalId());
 
         usersRepository.save(users);
-        return null;
+
+        String token = JwtService.generateToken(request.getUserNationalId()); // Logic Bug need to use national ID for the token
+        return AuthResponse.builder().token(token).build();
     }
 
     @Override
@@ -38,8 +45,8 @@ public class AuthServiceImpl implements AuthService {
 
 
         if (passwordEncoder.matches(request.getUserPassword(), users.getPassword())){
-            // pass jwt token
-            return null;
+            String token = JwtService.generateToken(request.getUserName();
+            return AuthResponse.builder().token(token).build();
         } else {
             throw new RuntimeException("login details incorrect");
         }

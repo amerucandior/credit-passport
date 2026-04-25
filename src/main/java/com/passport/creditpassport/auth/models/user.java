@@ -25,7 +25,8 @@ public class user {
     private String name;
 
     @Column(name = "user_no", unique = true)
-    private int number;
+    private String number;
 
+    @Column(name = "password", nullable = false)
     private String password;
 }
