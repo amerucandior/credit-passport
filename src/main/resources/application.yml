@@ -3,44 +3,36 @@ server:
 
 spring:
   application:
-      name: credit-passport
+    name: credit-passport
 
-sql:
-  init:
-    mode: never
+  sql:
+    init:
+      mode: never
 
-  # Master PostgreSQL Database (tenant registry)
-  datasource:
-    master:
-      jdbc-url: JDBC:postgresql://localhost:5432/master_db
-      username: finance
-      password: Pass
-      driver-class-name: org.postgresql.Driver
-      hikari:
-        maximum-pool-size: 20
-        minimum-idle: 5
-        connection-timeout: 30000
-        idle-timeout: 600000
-        max-lifetime: 1800000
-        pool-name: MasterPool
-
-  # JPA Configuration
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-        JDBC:
-          batch_size: 20
-          fetch_size: 50
-          timezone: UTC+3
+      ddl-auto: update
+
+  api-docs:
+    enabled: true
+
+  swagger-ui:
+    enabled: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/credit-passport
+    username: finance
+    password: Pass
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   security:
-    # JWT
     jwt:
-      secret: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b  # Min 256-bit key, set in env
-      access-token-expiry-ms: 900000  # 15 minutes
+      secret: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+      access-token-expiry-ms: 900000
       refresh-token-expiry-days: 2

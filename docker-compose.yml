@@ -1,1 +1,11 @@
-docker run --name postgres17  -e POSTGRES_USER=finance  -e POSTGRES_PASSWORD=Pass  -e POSTGRES_DB=mydb  -p 5432:5432  -d postgres:17
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres17
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: finance
+      POSTGRES_PASSWORD: Pass
+      POSTGRES_DB: credit-passport
+    restart: unless-stopped

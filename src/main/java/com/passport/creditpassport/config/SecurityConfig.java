@@ -16,13 +16,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//  Permits login and register endpoints
+    // Permits login and register endpoints
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // login & register are public
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html").permitAll() // login & register are public
                         .anyRequest().authenticated()               // everything else needs a token
                 );
 
