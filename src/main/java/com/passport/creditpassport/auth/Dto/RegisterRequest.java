@@ -1,31 +1,35 @@
 package com.passport.creditpassport.auth.Dto;
 
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.Getter;
-
-import lombok.Setter;
-import org.aspectj.bridge.Message;
 
 
-@Setter
-@Getter
 @Data
 public class RegisterRequest {
 
-    @NotBlank(message = "Enter a valid username") @Size(min = 3, max = 50)
+    @Schema(description = "Full name or username", example = "Mwirigi")
+    @NotBlank(message = "Enter a valid username")
+    @Size(min = 3, max = 50)
     private String name;
 
-    @NotBlank(message = "Enter a valid Phone Number")
+    @Schema(description = "Phone number", example = "0714225936")
+    @NotBlank(message = "Enter a valid phone number")
     private String number;
 
-    @NotNull @Size(min = 8, max = 100)
+    @Schema(description = "Password with at least 8 characters", example = "ianisking123")
+    @NotBlank(message = "Enter a password")
+    @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
     private String userPassword;
 
-    @NotBlank @Pattern(regexp = "\\d{7,8}", message = "Invalid Kenyan ID")
+    @Schema(description = "Kenyan national ID number", example = "40049284")
+    @NotBlank(message = "Enter your national ID")
+    @Pattern(regexp = "\\d{7,8}", message = "Invalid Kenyan ID")
     private String userNationalId;
+
+    @Schema(description = "Email address used for OTP verification", example = "ianmwirigi@outlook.com")
+    @NotBlank(message = "Enter your email address")
+    @Email(message = "Enter a valid email address")
+    private String email;
 }

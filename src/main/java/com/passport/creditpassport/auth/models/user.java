@@ -3,6 +3,10 @@ package com.passport.creditpassport.auth.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.Instant;
 
 @Setter
 @Getter
@@ -10,7 +14,8 @@ import lombok.Setter;
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(columnNames = "user_id"),
         @UniqueConstraint(columnNames = "national_id"),
-        @UniqueConstraint(columnNames = "user_no")
+        @UniqueConstraint(columnNames = "user_no"),
+        @UniqueConstraint(columnNames = "email")
         })
 public class user {
 
@@ -22,7 +27,7 @@ public class user {
     @Column(name = "national_id", unique = true, nullable = false)
     private String natId;
 
-    @Column(name = "user_name", unique = true, nullable = false)
+    @Column(name = "user_name", nullable = false)
     private String name;
 
     @Column(name = "user_no", unique = true, nullable = false)
@@ -30,4 +35,33 @@ public class user {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private boolean enabled = false;      // becomes true after email OTP verification
+
+    // Registration OTP
+    @Column(name = "registration_otp_hash")
+    private String registrationOtp;
+
+    @Column(name = "registration_otp_expires_at")
+    private Instant registrationOtpExpiresAt;
+
+    // Login OTP
+    @Column(name = "login_otp_hash")
+    private String loginOtp;
+
+    @Column(name = "login_otp_expires_at")
+    private Instant loginOtpExpiresAt;
+
+    // Auditing
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    private Instant updatedAt;
+
 }

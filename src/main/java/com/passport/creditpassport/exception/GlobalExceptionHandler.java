@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +35,37 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNotFound(ResourceNotFoundException ex,
+                                                          HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadCredentials(BadCredentialsException ex,
+                                                                 HttpServletRequest request) {
+        return buildError(HttpStatus.UNAUTHORIZED, "Invalid email/national ID or password", request);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(IllegalArgumentException ex,
+                                                            HttpServletRequest request) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleConflict(IllegalStateException ex,
+                                                          HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(OtpDeliveryException.class)
+    public ResponseEntity<ApiErrorResponse> handleOtpDelivery(OtpDeliveryException ex,
+                                                             HttpServletRequest request) {
+        log.error("OTP delivery failed while processing {}", request.getRequestURI(), ex);
+        return buildError(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request);
     }
 
     @Override
@@ -66,21 +98,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                       HttpServletRequest request) {
         log.error("Unhandled exception while processing {}", request.getRequestURI(), ex);
 
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", request);
+    }
+
+    private ResponseEntity<ApiErrorResponse> buildError(HttpStatus status,
+                                                       String message,
+                                                       HttpServletRequest request) {
         ApiErrorResponse error = ApiErrorResponse.builder()
                 .timestamp(Instant.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .message("Unexpected error")
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(message)
                 .path(request.getRequestURI())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        return ResponseEntity.status(status).body(error);
     }
 
     @Getter
     @Builder
     @AllArgsConstructor
-    static class ApiErrorResponse {
+    public static class ApiErrorResponse {
         private Instant timestamp;
         private int status;
         private String error;
@@ -91,7 +129,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Getter
     @Builder
     @AllArgsConstructor
-    static class ValidationErrorResponse {
+    public static class ValidationErrorResponse {
         private Instant timestamp;
         private int status;
         private String error;

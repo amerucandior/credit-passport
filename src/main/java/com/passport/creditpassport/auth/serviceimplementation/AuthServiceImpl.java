@@ -1,90 +1,99 @@
 package com.passport.creditpassport.auth.serviceimplementation;
 
-
-import com.passport.creditpassport.auth.Dto.AuthResponse;
 import com.passport.creditpassport.auth.Dto.LoginRequest;
 import com.passport.creditpassport.auth.Dto.RegisterRequest;
-import com.passport.creditpassport.exception.DuplicateAuthExceptions;
-import com.passport.creditpassport.exception.NameAlreadyExistsException;
-import com.passport.creditpassport.exception.NationalIdAlreadyExistsException;
-import com.passport.creditpassport.exception.NumberAlreadyExistsException;
 import com.passport.creditpassport.auth.models.user;
 import com.passport.creditpassport.auth.repository.UsersRepository;
 import com.passport.creditpassport.auth.service.AuthService;
-import com.passport.creditpassport.config.JwtService;
+import com.passport.creditpassport.exception.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-
-
+import java.util.Collections;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements AuthService, AuthenticationManager {
 
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Saves the new account. No JWT is issued — the account is disabled until
+     * the registration OTP is verified by RegistrationOtpImpl.
+     */
     @Override
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
-
-    //  Pre Check for duplicates
+    public void register(RegisterRequest request) {
         if (usersRepository.existsByName(request.getName())) {
             throw new NameAlreadyExistsException(request.getName());
         }
         if (usersRepository.existsByNatId(request.getUserNationalId())) {
             throw new NationalIdAlreadyExistsException(request.getUserNationalId());
         }
-        if (usersRepository.existsByNumber(String.valueOf(request.getNumber()))) {
+        if (usersRepository.existsByNumber(request.getNumber())) {
             throw new NumberAlreadyExistsException(request.getNumber());
         }
+        if (usersRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException(request.getEmail());
+        }
 
-
-            user users = new user();
-            users.setName(request.getName());
-            users.setNumber(request.getNumber());
-            users.setPassword(passwordEncoder.encode(request.getUserPassword()));
-            users.setNatId(request.getUserNationalId());
+        user newUser = new user();
+        newUser.setName(request.getName());
+        newUser.setNumber(request.getNumber());
+        newUser.setPassword(passwordEncoder.encode(request.getUserPassword()));
+        newUser.setNatId(request.getUserNationalId());
+        newUser.setEmail(request.getEmail());
 
         try {
-            user savedUser = usersRepository.save(users);
-            String token = JwtService.generateToken(savedUser.getNatId());
-            log.info("User {} registered successfully", request.getName());
-            return AuthResponse.builder().token(token).build();
+            usersRepository.save(newUser);
+            log.info("User '{}' <{}> created — awaiting OTP verification", request.getName(), request.getEmail());
         } catch (DataIntegrityViolationException e) {
-            log.warn("Duplicate value detected during user registration: {}", e.getMessage());
-
-            // Determine which column caused the Duplication Error
+            log.warn("Duplicate value detected during registration: {}", e.getMessage());
             String msg = e.getMostSpecificCause().getMessage().toLowerCase();
-            if (msg.contains("user_name")) {
-                throw  new NameAlreadyExistsException(request.getName());
-            } else if (msg.contains("national_id")) {
-                throw  new NationalIdAlreadyExistsException(request.getUserNationalId());
-            } else if (msg.contains("user_no")) {
-                throw  new NumberAlreadyExistsException(request.getNumber());
-            } else {
-                throw new DuplicateAuthExceptions("user already exists");
-            }
+            if (msg.contains("user_name"))        throw new NameAlreadyExistsException(request.getName());
+            else if (msg.contains("national_id")) throw new NationalIdAlreadyExistsException(request.getUserNationalId());
+            else if (msg.contains("user_no"))     throw new NumberAlreadyExistsException(request.getNumber());
+            else if (msg.contains("email"))       throw new EmailAlreadyExistsException(request.getEmail());
+            else                                  throw new DuplicateAuthExceptions("User already exists");
         }
     }
 
-    @Transactional
+    /**
+     * Validates email + password only. No JWT is issued here.
+     * Delegates to authenticate() so the logic lives in one place.
+     */
     @Override
-    public AuthResponse login(LoginRequest request) {
-        user users = usersRepository.findByNatId(request.getUserNationalId()).orElseThrow(() -> new RuntimeException("user not found"));
+    public void initiateLogin(LoginRequest request) {
+        authenticate(new UsernamePasswordAuthenticationToken(request.getIdentifier(), request.getUserPassword()));
+    }
 
-        if (passwordEncoder.matches(request.getUserPassword(), users.getPassword())){
-            String token = JwtService.generateToken(users.getNatId());
-            return AuthResponse.builder().token(token).build();
-        } else {
-            throw new RuntimeException("login details incorrect");
+    /**
+     * Spring Security AuthenticationManager contract.
+     * Called internally by initiateLogin() and by LoginOtpImpl directly.
+     */
+    @Override
+    public @NonNull Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String identifier = (String) authentication.getPrincipal();
+        String password = (String) authentication.getCredentials();
+
+        user found = usersRepository.findByEmailOrNatId(identifier, identifier)
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(password, found.getPassword())) {
+            throw new BadCredentialsException("Invalid credentials");
         }
+
+        return new UsernamePasswordAuthenticationToken(found, null, Collections.emptyList());
     }
 }

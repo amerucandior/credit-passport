@@ -1,19 +1,21 @@
 package com.passport.creditpassport.auth.Dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class LoginRequest {
 
-    @NotBlank
-    @Pattern(regexp = "\\d{7,8}", message = "Invalid Kenyan ID")
-    private String userNationalId;
+    @Schema(
+            description = "Email address or Kenyan national ID used to log in",
+            example = "ianmwirigi@outlook.com"
+    )
+    @NotBlank(message = "Enter your email address or national ID")
+    private String identifier;
 
-    @NotNull
+    @Schema(description = "Account password", example = "ianisking123")
+    @NotBlank(message = "Enter your password")
     private String userPassword;
+
 }
