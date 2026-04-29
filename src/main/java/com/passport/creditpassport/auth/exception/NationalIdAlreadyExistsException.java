@@ -1,4 +1,4 @@
-package com.passport.creditpassport.exception;
+package com.passport.creditpassport.auth.exception;
 
 public class NationalIdAlreadyExistsException extends DuplicateAuthExceptions {
     public NationalIdAlreadyExistsException(String UserNationalId) {

@@ -4,7 +4,7 @@ import com.passport.creditpassport.auth.models.user;
 import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpService;
 import com.passport.creditpassport.auth.repository.UsersRepository;
-import com.passport.creditpassport.exception.ResourceNotFoundException;
+import com.passport.creditpassport.auth.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +44,7 @@ public class RegistrationOtpImpl {
 
         emailService.sendOtpEmail(email, "Your registration code", otpCode);
         log.info("Registration OTP sent to {}", email);
+//        emailService.sendSimpleEmail(email, "Your registration code", otpCode);
     }
 
     /**

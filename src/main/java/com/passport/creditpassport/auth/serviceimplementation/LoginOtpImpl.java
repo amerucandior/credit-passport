@@ -6,10 +6,11 @@ import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpService;
 import com.passport.creditpassport.auth.repository.UsersRepository;
 import com.passport.creditpassport.config.JwtService;
-import com.passport.creditpassport.exception.ResourceNotFoundException;
+import com.passport.creditpassport.auth.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class LoginOtpImpl {
     private final UsersRepository usersRepository;
     private final EmailService emailService;
     private final AuthServiceImpl authServiceImpl;
+    private final JwtService jwtService;
 
 
     /**
@@ -63,14 +65,14 @@ public class LoginOtpImpl {
      * @throws IllegalArgumentException if the OTP is expired or incorrect
      */
     @Transactional
-    public AuthResponse verifyLoginOtp(String email, String rawOtp) {
+    public AuthResponse verifyLoginOtp(String email, String otpCode) {
         user user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!OtpService.isValid(user.getLoginOtpExpiresAt())) {
             throw new IllegalArgumentException("Login OTP has expired.");
         }
-        if (!OtpService.verifyOtp(rawOtp, user.getLoginOtp())) {
+        if (!OtpService.verifyOtp(otpCode, user.getLoginOtp())) {
             throw new IllegalArgumentException("Invalid login OTP.");
         }
 
@@ -79,7 +81,7 @@ public class LoginOtpImpl {
         user.setLoginOtpExpiresAt(null);
         usersRepository.save(user);
 
-        String token = JwtService.generateToken(user.getNatId());
+        String token = jwtService.generateToken(user.getNatId());
         log.info("Login successful for user {} email {}", user.getName(), user.getEmail());
 
         return AuthResponse.builder().token(token).build();

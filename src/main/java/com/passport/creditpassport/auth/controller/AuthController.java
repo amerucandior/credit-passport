@@ -7,7 +7,7 @@ import com.passport.creditpassport.auth.Dto.RegisterRequest;
 import com.passport.creditpassport.auth.service.AuthService;
 import com.passport.creditpassport.auth.serviceimplementation.LoginOtpImpl;
 import com.passport.creditpassport.auth.serviceimplementation.RegistrationOtpImpl;
-import com.passport.creditpassport.exception.GlobalExceptionHandler;
+import com.passport.creditpassport.auth.exception.GlobalExceptionHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

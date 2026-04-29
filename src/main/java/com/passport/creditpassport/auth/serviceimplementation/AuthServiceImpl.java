@@ -2,10 +2,10 @@ package com.passport.creditpassport.auth.serviceimplementation;
 
 import com.passport.creditpassport.auth.Dto.LoginRequest;
 import com.passport.creditpassport.auth.Dto.RegisterRequest;
+import com.passport.creditpassport.auth.exception.*;
 import com.passport.creditpassport.auth.models.user;
 import com.passport.creditpassport.auth.repository.UsersRepository;
 import com.passport.creditpassport.auth.service.AuthService;
-import com.passport.creditpassport.exception.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +35,7 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
     @Override
     @Transactional
     public void register(RegisterRequest request) {
-        if (usersRepository.existsByName(request.getName())) {
-            throw new NameAlreadyExistsException(request.getName());
-        }
+
         if (usersRepository.existsByNatId(request.getUserNationalId())) {
             throw new NationalIdAlreadyExistsException(request.getUserNationalId());
         }
@@ -57,7 +55,7 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
 
         try {
             usersRepository.save(newUser);
-            log.info("User '{}' <{}> created — awaiting OTP verification", request.getName(), request.getEmail());
+            log.info("User '{}' <{}> created - awaiting OTP verification", request.getName(), request.getEmail());
         } catch (DataIntegrityViolationException e) {
             log.warn("Duplicate value detected during registration: {}", e.getMessage());
             String msg = e.getMostSpecificCause().getMessage().toLowerCase();
