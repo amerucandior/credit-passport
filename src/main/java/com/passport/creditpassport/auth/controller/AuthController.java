@@ -1,13 +1,13 @@
 package com.passport.creditpassport.auth.controller;
 
-import com.passport.creditpassport.auth.Dto.AuthResponse;
-import com.passport.creditpassport.auth.Dto.LoginRequest;
-import com.passport.creditpassport.auth.Dto.OtpRequest;
-import com.passport.creditpassport.auth.Dto.RegisterRequest;
+import com.passport.creditpassport.auth.dto.AuthResponse;
+import com.passport.creditpassport.auth.dto.LoginRequest;
+import com.passport.creditpassport.auth.dto.OtpRequest;
+import com.passport.creditpassport.auth.dto.RegisterRequest;
 import com.passport.creditpassport.auth.service.AuthService;
 import com.passport.creditpassport.auth.serviceimplementation.LoginOtpImpl;
 import com.passport.creditpassport.auth.serviceimplementation.RegistrationOtpImpl;
-import com.passport.creditpassport.auth.exception.GlobalExceptionHandler;
+import com.passport.creditpassport.exception.GlobalExceptionHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

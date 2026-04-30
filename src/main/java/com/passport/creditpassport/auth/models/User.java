@@ -17,13 +17,13 @@ import java.time.Instant;
         @UniqueConstraint(columnNames = "user_no"),
         @UniqueConstraint(columnNames = "email")
         })
-public class user {
+public class User {
 
-    @GeneratedValue(strategy = GenerationType.UUID )
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id")
     private String id;
-
+    
     @Column(name = "national_id", unique = true, nullable = false)
     private String natId;
 

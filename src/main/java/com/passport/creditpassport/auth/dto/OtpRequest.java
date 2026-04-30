@@ -1,4 +1,4 @@
-package com.passport.creditpassport.auth.Dto;
+package com.passport.creditpassport.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -12,7 +12,7 @@ public class OtpRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class VerifyOtpRequest {
-        @Schema(description = "Email address that received the OTP", example = "ianmwirigi@outlook.com")
+        @Schema(description = "Email address that received the OTP", example = "johndoe@example.com")
         @NotBlank
         @Email
         private String email;
@@ -33,7 +33,7 @@ public class OtpRequest {
     @Builder
     public static class EmailOnlyRequest {
 
-        @Schema(description = "Email address for the unverified account", example = "ianmwirigi@outlook.com")
+        @Schema(description = "Email address for the unverified account", example = "johndoe@example.com")
         @NotBlank
         @Email
         private String email;

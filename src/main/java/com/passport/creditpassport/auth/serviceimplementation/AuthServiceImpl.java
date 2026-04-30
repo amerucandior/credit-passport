@@ -1,12 +1,12 @@
 package com.passport.creditpassport.auth.serviceimplementation;
 
-import com.passport.creditpassport.auth.Dto.LoginRequest;
-import com.passport.creditpassport.auth.Dto.RegisterRequest;
-import com.passport.creditpassport.auth.exception.*;
-import com.passport.creditpassport.auth.models.user;
+import com.passport.creditpassport.auth.dto.LoginRequest;
+import com.passport.creditpassport.auth.dto.RegisterRequest;
+import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.repository.UsersRepository;
 import com.passport.creditpassport.auth.service.AuthService;
-import jakarta.transaction.Transactional;
+import com.passport.creditpassport.exception.*;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -46,7 +46,7 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
-        user newUser = new user();
+        User newUser = new User();
         newUser.setName(request.getName());
         newUser.setNumber(request.getNumber());
         newUser.setPassword(passwordEncoder.encode(request.getUserPassword()));
@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
         String identifier = (String) authentication.getPrincipal();
         String password = (String) authentication.getCredentials();
 
-        user found = usersRepository.findByEmailOrNatId(identifier, identifier)
+        User found = usersRepository.findByEmailOrNatId(identifier, identifier)
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(password, found.getPassword())) {

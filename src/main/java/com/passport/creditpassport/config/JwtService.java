@@ -3,44 +3,79 @@ package com.passport.creditpassport.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
-
-import static java.security.KeyRep.Type.SECRET;
 
 @Service
 public class JwtService {
 
-    private static final String JWT_SECRET = "3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b";
-    private static final String JWT_ISSUER = "credit-passport";
-    private static final long JWT_EXPIRATION_TIME = 900000; //15 mins
+    @Value("${spring.security.jwt.secret}")
+    private String jwtSecret;
 
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
+    @Value("${spring.security.jwt.expiration-ms}")
+    private long jwtExpirationMs;
+
+    private static final String JWT_ISSUER = "credit-passport";
+
+    // Key
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String userName) {
-        Date now = new Date();
+    // Generate
 
-        Date expiry = new Date(now.getTime() + JWT_EXPIRATION_TIME);
+    /**
+     * Issues a signed JWT.
+     *
+     * @param userId the entity's UUID `id` field — not natId, not name.
+     *               UUIDs are stable; names and national IDs can change.
+     *               The filter uses this value to call usersRepository.findById().
+     */
+    public String generateToken(String userId) {
+        Date now    = new Date();
+        Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
         return Jwts.builder()
-                .subject(userName)
+                .subject(userId)          // subject = UUID primary key
                 .issuer(JWT_ISSUER)
                 .issuedAt(now)
                 .expiration(expiry)
                 .id(UUID.randomUUID().toString())
                 .signWith(getSigningKey())
                 .compact();
-
     }
 
-    // extract username from token
-    public String extractUserName(String token) {
+    // Validate
+
+    /**
+     * Returns true when the token is structurally valid, correctly signed,
+     * and not yet expired.
+     * The filter catches any exception this might throw, so callers do not
+     * need their own try/catch.
+     */
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = extractClaims(token);
+            return !claims.getExpiration().before(new Date());
+        } catch (Exception e) {
+            // JwtException subtypes: MalformedJwtException, ExpiredJwtException,
+            // SignatureException, UnsupportedJwtException — all mean "not valid"
+            return false;
+        }
+    }
+
+    // Extract
+
+    /**
+     * Returns the subject claim — the UUID stored when the token was generated.
+     */
+    public String extractSubject(String token) {
         return extractClaims(token).getSubject();
     }
 
@@ -48,15 +83,11 @@ public class JwtService {
         return extractClaims(token).getExpiration();
     }
 
-    // Check token has not expired
-    public boolean validateToken(String token, String userName) {
-        return extractUserName(token).equals(userName)
-                && !extractExpiration(token).before(new Date());
-    }
+    // Internal
 
     private Claims extractClaims(String token) {
         return Jwts.parser()
-                .verifyWith((SecretKey) getSigningKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

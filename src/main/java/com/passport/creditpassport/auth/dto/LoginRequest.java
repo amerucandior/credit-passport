@@ -1,4 +1,4 @@
-package com.passport.creditpassport.auth.Dto;
+package com.passport.creditpassport.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ public class LoginRequest {
 
     @Schema(
             description = "Email address or Kenyan national ID used to log in",
-            example = "ianmwirigi@outlook.com"
+            example = "johndoe@example.com"
     )
     @NotBlank(message = "Enter your email address or national ID")
     private String identifier;

@@ -1,11 +1,11 @@
 package com.passport.creditpassport.auth.serviceimplementation;
 
-import com.passport.creditpassport.auth.models.user;
+import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpService;
 import com.passport.creditpassport.auth.repository.UsersRepository;
-import com.passport.creditpassport.auth.exception.ResourceNotFoundException;
-import jakarta.transaction.Transactional;
+import com.passport.creditpassport.exception.ResourceNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class RegistrationOtpImpl {
      */
     @Transactional
     public void sendRegistrationOtp(String email) {
-        user user = usersRepository.findByEmail(email)
+        User user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String otpCode = OtpService.generateOtpCode();
@@ -52,7 +52,7 @@ public class RegistrationOtpImpl {
      */
     @Transactional
     public void resendRegistrationOtp(String email) {
-        user user = usersRepository.findByEmail(email)
+        User user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.isEnabled()) {
@@ -75,7 +75,7 @@ public class RegistrationOtpImpl {
      */
     @Transactional
     public void verifyRegistrationOtp(String email, String rawOtp) {
-        user user = usersRepository.findByEmail(email)
+        User user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.isEnabled()) {

@@ -1,4 +1,4 @@
-package com.passport.creditpassport.auth.exception;
+package com.passport.creditpassport.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;

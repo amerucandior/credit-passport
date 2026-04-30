@@ -1,4 +1,4 @@
-package com.passport.creditpassport.auth.Dto;
+package com.passport.creditpassport.auth.dto;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;

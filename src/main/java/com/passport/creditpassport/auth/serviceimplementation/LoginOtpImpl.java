@@ -1,16 +1,15 @@
 package com.passport.creditpassport.auth.serviceimplementation;
 
-import com.passport.creditpassport.auth.Dto.AuthResponse;
-import com.passport.creditpassport.auth.models.user;
+import com.passport.creditpassport.auth.dto.AuthResponse;
+import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpService;
 import com.passport.creditpassport.auth.repository.UsersRepository;
 import com.passport.creditpassport.config.JwtService;
-import com.passport.creditpassport.auth.exception.ResourceNotFoundException;
-import jakarta.transaction.Transactional;
+import com.passport.creditpassport.exception.ResourceNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -40,9 +39,8 @@ public class LoginOtpImpl {
                 new UsernamePasswordAuthenticationToken(identifier, password)
         );
 
-        user user = (user) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
 
-        assert user != null;
         if (!user.isEnabled()) {
             throw new IllegalStateException("Account not verified. Complete email verification first.");
         }
@@ -66,7 +64,7 @@ public class LoginOtpImpl {
      */
     @Transactional
     public AuthResponse verifyLoginOtp(String email, String otpCode) {
-        user user = usersRepository.findByEmail(email)
+        User user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!OtpService.isValid(user.getLoginOtpExpiresAt())) {
@@ -81,7 +79,7 @@ public class LoginOtpImpl {
         user.setLoginOtpExpiresAt(null);
         usersRepository.save(user);
 
-        String token = jwtService.generateToken(user.getNatId());
+        String token = jwtService.generateToken(user.getId());
         log.info("Login successful for user {} email {}", user.getName(), user.getEmail());
 
         return AuthResponse.builder().token(token).build();

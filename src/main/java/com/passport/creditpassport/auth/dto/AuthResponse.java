@@ -1,4 +1,4 @@
-package com.passport.creditpassport.auth.Dto;
+package com.passport.creditpassport.auth.dto;
 
 import lombok.Builder;
 import lombok.Data;
