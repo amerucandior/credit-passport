@@ -7,6 +7,7 @@ import com.passport.creditpassport.UserProfile.service.ProfileService;
 import com.passport.creditpassport.UserProfile.models.UserProfile;
 import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
+import org.jspecify.annotations.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,14 @@ public class ProfileServiceImpl implements ProfileService{
             throw new IllegalStateException("UserProfile already exists!");
         }
 
+        UserProfile userProfile = getUserProfile(request, userId);
+
+        UserProfile saved = profileRepository.save(userProfile);
+        log.info("Profile created for userId {}", userId);
+        return ProfileResponse.fromEntity(saved);
+    }
+
+    private static @NonNull UserProfile getUserProfile(UpdateProfileRequest request, String userId) {
         UserProfile userProfile = new UserProfile();
         userProfile.setUserId(userId);
         userProfile.setGender(request.getGender());
@@ -38,13 +47,10 @@ public class ProfileServiceImpl implements ProfileService{
         userProfile.setOccupation(request.getOccupation());
         userProfile.setMonthlyIncomeKes(request.getMonthlyIncomeKes());
         userProfile.setProfilePhotoUrl(request.getProfilePhotoUrl());
-
-        UserProfile saved = profileRepository.save(userProfile);
-        log.info("Profile created for userId {}", userId);
-        return ProfileResponse.fromEntity(saved);
+        return userProfile;
     }
 
-//    Read user profile
+    //    Read user profile
     @Transactional(readOnly = true)
     @Override
     public ProfileResponse getProfile(User authenticatedUser) {

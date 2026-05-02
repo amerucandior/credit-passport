@@ -6,7 +6,6 @@ import lombok.Data;
 
 @Data
 public class LoginRequest {
-
     @Schema(
             description = "Email address or Kenyan national ID used to log in",
             example = "johndoe@example.com"
@@ -14,7 +13,7 @@ public class LoginRequest {
     @NotBlank(message = "Enter your email address or national ID")
     private String identifier;
 
-    @Schema(description = "Account password", example = "ianisking123")
+    @Schema(description = "Account password", example = "123@#$df")
     @NotBlank(message = "Enter your password")
     private String userPassword;
 

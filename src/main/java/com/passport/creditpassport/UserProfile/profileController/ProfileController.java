@@ -29,7 +29,7 @@ public class ProfileController {
      * The controller never touches userId strings; the service owns that logic.
      */
 
-    @Operation(summary = "Create your profile")
+    @Operation(summary = "Create a profile")
     @PostMapping
     public ResponseEntity<ProfileResponse> createProfile(
             @AuthenticationPrincipal User authenticatedUser,
