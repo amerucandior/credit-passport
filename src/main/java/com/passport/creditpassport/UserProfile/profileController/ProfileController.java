@@ -35,7 +35,7 @@ public class ProfileController {
             @AuthenticationPrincipal User authenticatedUser,
             @Valid @RequestBody UpdateProfileRequest request) {
         ProfileResponse response = profileService.createProfile(authenticatedUser, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response); // todo: Fix xss security issues
     }
 
     @Operation(summary = "Get your profile")
