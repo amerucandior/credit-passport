@@ -43,6 +43,6 @@ spring:
 
   security:
     jwt:
-      secret: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
-      access-token-expiry-ms: 900000
+      secret: 7cc6146283dfa8522d74794379255990c40dca05c647a42162d984d71824d801
+      expiration-ms: 900000
       refresh-token-expiry-days: 2

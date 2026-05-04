@@ -13,15 +13,30 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.util.UriUtils;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(InvalidProfilePhotoUrlException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidPhotoUrl(InvalidProfilePhotoUrlException ex,
+                                                                   HttpServletRequest request) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(ProfileAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleProfileAlreadyExists(ProfileAlreadyExistsException ex,
+                                                                       HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
 
     @ExceptionHandler(DuplicateAuthExceptions.class)
     public ResponseEntity<ApiErrorResponse> handleDuplicate(DuplicateAuthExceptions ex,
@@ -31,7 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(HttpStatus.CONFLICT.value())
                 .error(HttpStatus.CONFLICT.getReasonPhrase())
                 .message(ex.getMessage())
-                .path(request.getRequestURI())
+                .path(safeRequestPath(request))
                 .build();
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
@@ -63,9 +78,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(OtpDeliveryException.class)
     public ResponseEntity<ApiErrorResponse> handleOtpDelivery(OtpDeliveryException ex,
-                                                             HttpServletRequest request) {
-        log.error("OTP delivery failed while processing {}", request.getRequestURI(), ex);
-        return buildError(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request);
+                                                              HttpServletRequest request) {
+        // no stack trace here — EmailService already logged it with full context
+        log.warn("OTP delivery failed [retryable={}] at [{}]",
+                ex.isRetryable(), request.getRequestURI());
+
+        if (ex.isRetryable()) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Retry-After", "30");
+            ApiErrorResponse body = buildError(HttpStatus.SERVICE_UNAVAILABLE,
+                    "OTP delivery failed. Please try again later.", request).getBody();
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .headers(headers)
+                    .body(body);
+        }
+
+
+        return buildError(HttpStatus.UNPROCESSABLE_CONTENT,
+                "OTP could not be delivered to this destination.", request);
     }
 
     @Override
@@ -87,7 +117,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .message("Validation failed")
                 .fieldErrors(fieldErrors)
-                .path(request.getDescription(false))
+                .path(request instanceof ServletWebRequest servletWebRequest
+                        ? safeRequestPath(servletWebRequest.getRequest())
+                        : "/")
                 .build();
 
         return ResponseEntity.badRequest().body(error);
@@ -109,10 +141,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(status.value())
                 .error(status.getReasonPhrase())
                 .message(message)
-                .path(request.getRequestURI())
+                .path(safeRequestPath(request))
                 .build();
 
         return ResponseEntity.status(status).body(error);
+    }
+
+    private String safeRequestPath(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        if (requestUri == null || requestUri.isBlank()) {
+            return "/";
+        }
+        return UriUtils.encodePath(requestUri, StandardCharsets.UTF_8);
     }
 
     @Getter

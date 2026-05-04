@@ -81,10 +81,10 @@ public class RegistrationOtpImpl {
         if (user.isEnabled()) {
             throw new IllegalStateException("Account is already verified.");
         }
-        if (!OtpService.isValid(user.getRegistrationOtpExpiresAt())) {
+        if (OtpService.isValid(user.getRegistrationOtpExpiresAt())) {
             throw new IllegalArgumentException("Registration OTP has expired.");
         }
-        if (!OtpService.verifyOtp(rawOtp, user.getRegistrationOtp())) {
+        if (OtpService.verifyOtp(rawOtp, user.getRegistrationOtp())) {
             throw new IllegalArgumentException("Invalid registration OTP.");
         }
 

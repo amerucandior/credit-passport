@@ -6,6 +6,8 @@ import com.passport.creditpassport.UserProfile.repository.ProfileRepository;
 import com.passport.creditpassport.UserProfile.service.ProfileService;
 import com.passport.creditpassport.UserProfile.models.UserProfile;
 import com.passport.creditpassport.auth.models.User;
+import com.passport.creditpassport.exception.InvalidProfilePhotoUrlException;
+import com.passport.creditpassport.exception.ProfileAlreadyExistsException;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NonNull;
@@ -30,11 +32,11 @@ public class ProfileServiceImpl implements ProfileService{
             URI uri = new URI(url);
             String scheme = uri.getScheme();
             if (!"https".equalsIgnoreCase(scheme) && !"http".equalsIgnoreCase(scheme)) {
-                throw new IllegalArgumentException("Invalid URL scheme: " + scheme);
+                throw new InvalidProfilePhotoUrlException();
             }
             return uri.toString();
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("Malformed profile photo URL");
+            throw new InvalidProfilePhotoUrlException();
         }
     }
 
@@ -46,7 +48,7 @@ public class ProfileServiceImpl implements ProfileService{
         String userId = authenticatedUser.getId();
 
         if (profileRepository.existsByUserId(userId)) {
-            throw new IllegalStateException("UserProfile already exists!");
+            throw new ProfileAlreadyExistsException(userId);
         }
 
         UserProfile userProfile = getUserProfile(request, userId);
@@ -62,13 +64,13 @@ public class ProfileServiceImpl implements ProfileService{
         userProfile.setGender(request.getGender());
         userProfile.setDateOfBirth(request.getDateOfBirth());
         userProfile.setEmployerName(
-                StringEscapeUtils.escapeHtml4(request.getEmployerName())); // Sanitize free text from xss
+                StringEscapeUtils.escapeHtml4(request.getEmployerName()));
         userProfile.setEmploymentStatus(request.getEmploymentStatus());
         userProfile.setOccupation(
                 StringEscapeUtils.escapeHtml4(request.getOccupation()));
         userProfile.setMonthlyIncomeKes(request.getMonthlyIncomeKes());
         userProfile.setProfilePhotoUrl(
-                sanitizeUrl(request.getProfilePhotoUrl()));                 // URL — special case
+                sanitizeUrl(request.getProfilePhotoUrl()));
         return userProfile;
     }
 
@@ -96,12 +98,14 @@ public class ProfileServiceImpl implements ProfileService{
         // Only overwrite fields that were actually supplied
         if (request.getGender()           != null) profile.setGender(request.getGender());
         if (request.getDateOfBirth()      != null) profile.setDateOfBirth(request.getDateOfBirth());
-        if (request.getEmployerName()     != null) profile.setEmployerName(request.getEmployerName());
+        if (request.getEmployerName()    != null) profile.setEmployerName(
+                StringEscapeUtils.escapeHtml4(request.getEmployerName()));
+        if (request.getOccupation()      != null) profile.setOccupation(
+                StringEscapeUtils.escapeHtml4(request.getOccupation()));
         if (request.getEmploymentStatus() != null) profile.setEmploymentStatus(request.getEmploymentStatus());
-        if (request.getOccupation()       != null) profile.setOccupation(request.getOccupation());
         if (request.getMonthlyIncomeKes() != null) profile.setMonthlyIncomeKes(request.getMonthlyIncomeKes());
-        if (request.getProfilePhotoUrl()  != null) profile.setProfilePhotoUrl(request.getProfilePhotoUrl());
-
+        if (request.getProfilePhotoUrl() != null) profile.setProfilePhotoUrl(
+                sanitizeUrl(request.getProfilePhotoUrl()));
         UserProfile saved = profileRepository.save(profile);
         log.info("Profile updated for userId {}", userId);
         return ProfileResponse.fromEntity(saved);

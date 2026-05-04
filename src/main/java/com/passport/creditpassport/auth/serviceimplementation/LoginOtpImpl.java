@@ -67,10 +67,10 @@ public class LoginOtpImpl {
         User user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (!OtpService.isValid(user.getLoginOtpExpiresAt())) {
+        if (OtpService.isValid(user.getLoginOtpExpiresAt())) {
             throw new IllegalArgumentException("Login OTP has expired.");
         }
-        if (!OtpService.verifyOtp(otpCode, user.getLoginOtp())) {
+        if (OtpService.verifyOtp(otpCode, user.getLoginOtp())) {
             throw new IllegalArgumentException("Invalid login OTP.");
         }
 

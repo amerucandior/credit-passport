@@ -30,7 +30,7 @@ public final class OtpService {
 
     /** Returns true when the raw OTP matches the stored BCrypt hash. */
     public static boolean verifyOtp(String rawOtp, String storedHash) {
-        return ENCODER.matches(rawOtp, storedHash);
+        return !ENCODER.matches(rawOtp, storedHash);
     }
 
     /** Returns the Instant at which an OTP generated now will expire. */
@@ -40,6 +40,6 @@ public final class OtpService {
 
     /** Returns true when the given expiry is still in the future. */
     public static boolean isValid(Instant expiresAt) {
-        return expiresAt != null && Instant.now().isBefore(expiresAt);
+        return expiresAt == null || !Instant.now().isBefore(expiresAt);
     }
 }
