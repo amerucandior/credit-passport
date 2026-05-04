@@ -12,14 +12,13 @@ spring:
 
   jpa:
     hibernate:
-      # Override in Railway if needed (e.g. validate).
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      ddl-auto: update
 
   datasource:
     # Prefer explicit Spring datasource vars, fallback to Railway Postgres vars.
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}}
-    username: ${SPRING_DATASOURCE_USERNAME:${PGUSER}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${PGPASSWORD}}
+    url: jdbc:postgresql://localhost:5432/credit_passport
+    username: finance
+    password: Pass
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
