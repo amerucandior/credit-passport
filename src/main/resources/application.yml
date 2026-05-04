@@ -1,5 +1,6 @@
 server:
-  port: 8080
+  # Railway injects PORT at runtime.
+  port: ${PORT:8080}
 
 spring:
   application:
@@ -11,12 +12,14 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      # Override in Railway if needed (e.g. validate).
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/credit-passport
-    username: finance
-    password: Pass
+    # Prefer explicit Spring datasource vars, fallback to Railway Postgres vars.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}}
+    username: ${SPRING_DATASOURCE_USERNAME:${PGUSER}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${PGPASSWORD}}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -28,8 +31,9 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ianmwirigi638@gmail.com
-    password: cxgtocarqafxjfjv
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    from: ${MAIL_USERNAME}
     properties:
       mail:
         smtp:
@@ -41,8 +45,12 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
+app:
+  mail:
+    from: ${MAIL_FROM}
+
   security:
     jwt:
-      secret: 7cc6146283dfa8522d74794379255990c40dca05c647a42162d984d71824d801
-      expiration-ms: 900000
+      secret: ${JWT_SECRET}
+      expiration-ms: ${EXPIRATION_MS}
       refresh-token-expiry-days: 2
