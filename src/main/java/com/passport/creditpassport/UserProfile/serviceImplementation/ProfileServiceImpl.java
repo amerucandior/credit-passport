@@ -68,6 +68,8 @@ public class ProfileServiceImpl implements ProfileService{
         userProfile.setEmploymentStatus(request.getEmploymentStatus());
         userProfile.setOccupation(
                 StringEscapeUtils.escapeHtml4(request.getOccupation()));
+        userProfile.setSaccoName(
+                StringEscapeUtils.escapeHtml4(request.getSaccoName()));
         userProfile.setMonthlyIncomeKes(request.getMonthlyIncomeKes());
         userProfile.setProfilePhotoUrl(
                 sanitizeUrl(request.getProfilePhotoUrl()));
@@ -102,6 +104,8 @@ public class ProfileServiceImpl implements ProfileService{
                 StringEscapeUtils.escapeHtml4(request.getEmployerName()));
         if (request.getOccupation()      != null) profile.setOccupation(
                 StringEscapeUtils.escapeHtml4(request.getOccupation()));
+        if (request.getSaccoName()       != null) profile.setSaccoName(
+                StringEscapeUtils.escapeHtml4(request.getSaccoName()));
         if (request.getEmploymentStatus() != null) profile.setEmploymentStatus(request.getEmploymentStatus());
         if (request.getMonthlyIncomeKes() != null) profile.setMonthlyIncomeKes(request.getMonthlyIncomeKes());
         if (request.getProfilePhotoUrl() != null) profile.setProfilePhotoUrl(

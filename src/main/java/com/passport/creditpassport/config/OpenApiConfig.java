@@ -3,7 +3,6 @@ package com.passport.creditpassport.config;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import org.springframework.context.annotation.Bean;
@@ -14,23 +13,27 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI OpenAPI() {
-        final String securitySchemeName = "bearerAuth";
+        final String bearerSecuritySchemeName = "bearerAuth";
+        final String apiKeySecuritySchemeName = "apiKeyAuth";
 
         return new OpenAPI()
                 .info(new Info()
                         .title("Credit-Passport API")
                         .description("API documentation for Credit-Passport System")
                         .version("1.0.0"))
-
-                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
-
                 .components(new Components()
-                        .addSecuritySchemes(securitySchemeName,
+                        .addSecuritySchemes(bearerSecuritySchemeName,
                                 new SecurityScheme()
-                                        .name(securitySchemeName)
+                                        .name(bearerSecuritySchemeName)
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
+                        )
+                        .addSecuritySchemes(apiKeySecuritySchemeName,
+                                new SecurityScheme()
+                                        .name("X-API-KEY")
+                                        .type(SecurityScheme.Type.APIKEY)
+                                        .in(SecurityScheme.In.HEADER)
                         )
                 );
     }

@@ -3,7 +3,7 @@ package com.passport.creditpassport.auth.serviceimplementation;
 import com.passport.creditpassport.auth.dto.AuthResponse;
 import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.service.EmailService;
-import com.passport.creditpassport.auth.service.OtpService;
+import com.passport.creditpassport.auth.service.OtpUtils;
 import com.passport.creditpassport.auth.repository.UsersRepository;
 import com.passport.creditpassport.config.JwtService;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
@@ -45,11 +45,11 @@ public class LoginOtpImpl {
             throw new IllegalStateException("Account not verified. Complete email verification first.");
         }
 
-        String otpCode = OtpService.generateOtpCode();
-        String otpHash = OtpService.hashOtp(otpCode);
+        String otpCode = OtpUtils.generateOtpCode();
+        String otpHash = OtpUtils.hashOtp(otpCode);
 
         user.setLoginOtp(otpHash);
-        user.setLoginOtpExpiresAt(OtpService.expiryInstant(OTP_TTL));
+        user.setLoginOtpExpiresAt(OtpUtils.expiryInstant(OTP_TTL));
         usersRepository.save(user);
 
         emailService.sendOtpEmail(user.getEmail(), "Your login code", otpCode);
@@ -67,10 +67,10 @@ public class LoginOtpImpl {
         User user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (OtpService.isValid(user.getLoginOtpExpiresAt())) {
+        if (!OtpUtils.isValid(user.getLoginOtpExpiresAt())) {
             throw new IllegalArgumentException("Login OTP has expired.");
         }
-        if (OtpService.verifyOtp(otpCode, user.getLoginOtp())) {
+        if (!OtpUtils.verifyOtp(otpCode, user.getLoginOtp())) {
             throw new IllegalArgumentException("Invalid login OTP.");
         }
 

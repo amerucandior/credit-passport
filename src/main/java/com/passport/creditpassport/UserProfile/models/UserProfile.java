@@ -49,6 +49,9 @@ public class UserProfile {
     @Column(name = "profile_photo_url")
     private String profilePhotoUrl;
 
+    @Column(name="sacco_name")
+    private String saccoName;
+
     @CreationTimestamp
     @Column(updatable = false)
     private Instant createdAt;

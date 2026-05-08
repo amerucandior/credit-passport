@@ -1,5 +1,6 @@
 package com.passport.creditpassport.config;
 
+import com.passport.creditpassport.lender.security.ApiKeyAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ApiKeyAuthFilter apiKeyAuthFilter;
+
     @Value("${app.cors.allowed-origins:http://localhost:8080,http://127.0.0.1:8080,http://16.171.148.5:8080}")
     private String allowedOrigins;
 
@@ -51,7 +54,7 @@ public class SecurityConfig {
                         .toList()
         );
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "X-API-KEY"));
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
@@ -87,6 +90,7 @@ public class SecurityConfig {
                         // Public — no token required
                         .requestMatchers(
                                 "/api/auth/**",         // register, login, verify-*, resend-*
+                                "/api/lender/**",       // api protected
                                 "/v3/api-docs/**",      // OpenAPI spec
                                 "/swagger-ui/**",       // Swagger UI assets
                                 "/swagger-ui.html"      // Swagger UI entry point
@@ -99,11 +103,15 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
+
                 // ── JWT filter ────────────────────────────────────────────────────
                 // Runs before Spring's own UsernamePasswordAuthenticationFilter.
                 // It reads the Bearer token, validates it, and populates the
                 // SecurityContext so downstream rules see an authenticated principal.
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // --- API KEY FILTER
+                .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // XSS filter
                 // prevents a malicious actor from storing malicious code to run on clients device

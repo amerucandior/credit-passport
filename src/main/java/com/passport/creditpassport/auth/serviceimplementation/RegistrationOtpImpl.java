@@ -2,7 +2,7 @@ package com.passport.creditpassport.auth.serviceimplementation;
 
 import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.service.EmailService;
-import com.passport.creditpassport.auth.service.OtpService;
+import com.passport.creditpassport.auth.service.OtpUtils;
 import com.passport.creditpassport.auth.repository.UsersRepository;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,11 +35,11 @@ public class RegistrationOtpImpl {
         User user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        String otpCode = OtpService.generateOtpCode();
-        String otpHash = OtpService.hashOtp(otpCode);
+        String otpCode = OtpUtils.generateOtpCode();
+        String otpHash = OtpUtils.hashOtp(otpCode);
 
         user.setRegistrationOtp(otpHash);
-        user.setRegistrationOtpExpiresAt(OtpService.expiryInstant(OTP_TTL));
+        user.setRegistrationOtpExpiresAt(OtpUtils.expiryInstant(OTP_TTL));
         usersRepository.save(user);
 
         emailService.sendOtpEmail(email, "Your registration code", otpCode);
@@ -81,10 +81,10 @@ public class RegistrationOtpImpl {
         if (user.isEnabled()) {
             throw new IllegalStateException("Account is already verified.");
         }
-        if (OtpService.isValid(user.getRegistrationOtpExpiresAt())) {
+        if (!OtpUtils.isValid(user.getRegistrationOtpExpiresAt())) {
             throw new IllegalArgumentException("Registration OTP has expired.");
         }
-        if (OtpService.verifyOtp(rawOtp, user.getRegistrationOtp())) {
+        if (!OtpUtils.verifyOtp(rawOtp, user.getRegistrationOtp())) {
             throw new IllegalArgumentException("Invalid registration OTP.");
         }
 

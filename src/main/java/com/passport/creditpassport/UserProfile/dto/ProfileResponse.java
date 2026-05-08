@@ -23,6 +23,7 @@ public class ProfileResponse {
     private EmploymentStatus employmentStatus;
     private String employerName;
     private String occupation;
+    private String saccoName;
     private BigDecimal monthlyIncomeKes;
     private String profilePhotoUrl;
     private Instant createdAt;
@@ -31,11 +32,11 @@ public class ProfileResponse {
     public static ProfileResponse fromEntity(UserProfile profile) {
         return ProfileResponse.builder()
                 .profileId(profile.getProfileId())
-                .userId(profile.getUserId())
                 .gender(profile.getGender())
                 .employmentStatus(profile.getEmploymentStatus())
                 .employerName(profile.getEmployerName())
                 .occupation(profile.getOccupation())
+                .saccoName(profile.getSaccoName())
                 .dateOfBirth(profile.getDateOfBirth())
                 .monthlyIncomeKes(profile.getMonthlyIncomeKes())
                 .profilePhotoUrl(profile.getProfilePhotoUrl())

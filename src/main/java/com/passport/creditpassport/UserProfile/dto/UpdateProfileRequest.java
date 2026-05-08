@@ -48,6 +48,17 @@ public class UpdateProfileRequest {
     @Size(max = 100, message = "Employer Name must not exceed 100 characters")
     private String employerName;
 
+
+    @Schema(
+            description = "Name of the user's current employer",
+            example = "Kenya Police Sacco",
+            maxLength = 100,
+            pattern = "^[^<>\"'&]*$"
+    )
+    @Pattern(regexp = "^[^<>\"'&]*$", message = "Invalid characters in Sacco Name")
+    @Size(max = 100, message = "Sacco Name must not exceed 100 characters")
+    private String saccoName;
+
     @Schema(
             description = "User's occupation or job title",
             example = "Software Engineer",
