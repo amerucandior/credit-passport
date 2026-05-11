@@ -47,20 +47,20 @@ public class ProfileServiceImpl implements ProfileService{
 
         String userId = authenticatedUser.getId();
 
-        if (profileRepository.existsByUserId(userId)) {
+        if (profileRepository.existsByUser_Id(userId)) {
             throw new ProfileAlreadyExistsException(userId);
         }
 
-        UserProfile userProfile = getUserProfile(request, userId);
+        UserProfile userProfile = getUserProfile(request, authenticatedUser);
 
         UserProfile saved = profileRepository.save(userProfile);
         log.info("Profile created for userId {}", userId);
         return ProfileResponse.fromEntity(saved);
     }
 
-    private static @NonNull UserProfile getUserProfile(UpdateProfileRequest request, String userId) {
+    private static @NonNull UserProfile getUserProfile(UpdateProfileRequest request, User authenticatedUser) {
         UserProfile userProfile = new UserProfile();
-        userProfile.setUserId(userId);
+        userProfile.setUser(authenticatedUser);
         userProfile.setGender(request.getGender());
         userProfile.setDateOfBirth(request.getDateOfBirth());
         userProfile.setEmployerName(
@@ -82,7 +82,7 @@ public class ProfileServiceImpl implements ProfileService{
     public ProfileResponse getProfile(User authenticatedUser) {
         String userId = authenticatedUser.getId();
 
-        UserProfile profile = profileRepository.findByUserId(userId)
+        UserProfile profile = profileRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
 
         return ProfileResponse.fromEntity(profile);
@@ -93,7 +93,7 @@ public class ProfileServiceImpl implements ProfileService{
     public ProfileResponse updateProfile(User authenticatedUser, UpdateProfileRequest request) {
         String userId = authenticatedUser.getId();
 
-        UserProfile profile = profileRepository.findByUserId(userId)
+        UserProfile profile = profileRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Profile not found — create one first."));
 
