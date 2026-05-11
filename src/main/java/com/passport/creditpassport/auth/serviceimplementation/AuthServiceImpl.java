@@ -36,33 +36,33 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
     @Transactional
     public void register(RegisterRequest request) {
 
-        if (usersRepository.existsByNatId(request.getUserNationalId())) {
-            throw new NationalIdAlreadyExistsException(request.getUserNationalId());
+        if (usersRepository.existsByNatId(request.userNationalId())) {
+            throw new NationalIdAlreadyExistsException(request.userNationalId());
         }
-        if (usersRepository.existsByNumber(request.getNumber())) {
-            throw new NumberAlreadyExistsException(request.getNumber());
+        if (usersRepository.existsByNumber(request.number())) {
+            throw new NumberAlreadyExistsException(request.number());
         }
-        if (usersRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException(request.getEmail());
+        if (usersRepository.existsByEmail(request.email())) {
+            throw new EmailAlreadyExistsException(request.email());
         }
 
         User newUser = new User();
-        newUser.setName(request.getName());
-        newUser.setNumber(request.getNumber());
-        newUser.setPassword(passwordEncoder.encode(request.getUserPassword()));
-        newUser.setNatId(request.getUserNationalId());
-        newUser.setEmail(request.getEmail());
+        newUser.setName(request.name());
+        newUser.setNumber(request.number());
+        newUser.setPassword(passwordEncoder.encode(request.userPassword()));
+        newUser.setNatId(request.userNationalId());
+        newUser.setEmail(request.email());
 
         try {
             usersRepository.save(newUser);
-            log.info("User '{}' <{}> created - awaiting OTP verification", request.getName(), request.getEmail());
+            log.info("User '{}' <{}> created - awaiting OTP verification", request.name(), request.email());
         } catch (DataIntegrityViolationException e) {
             log.warn("Duplicate value detected during registration: {}", e.getMessage());
             String msg = e.getMostSpecificCause().getMessage().toLowerCase();
-            if (msg.contains("user_name"))        throw new NameAlreadyExistsException(request.getName());
-            else if (msg.contains("national_id")) throw new NationalIdAlreadyExistsException(request.getUserNationalId());
-            else if (msg.contains("user_no"))     throw new NumberAlreadyExistsException(request.getNumber());
-            else if (msg.contains("email"))       throw new EmailAlreadyExistsException(request.getEmail());
+            if (msg.contains("user_name"))        throw new NameAlreadyExistsException(request.name());
+            else if (msg.contains("national_id")) throw new NationalIdAlreadyExistsException(request.userNationalId());
+            else if (msg.contains("user_no"))     throw new NumberAlreadyExistsException(request.number());
+            else if (msg.contains("email"))       throw new EmailAlreadyExistsException(request.email());
             else                                  throw new DuplicateAuthExceptions("User already exists");
         }
     }
@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
      */
     @Override
     public void initiateLogin(LoginRequest request) {
-        authenticate(new UsernamePasswordAuthenticationToken(request.getIdentifier(), request.getUserPassword()));
+        authenticate(new UsernamePasswordAuthenticationToken(request.identifier(), request.userPassword()));
     }
 
     /**

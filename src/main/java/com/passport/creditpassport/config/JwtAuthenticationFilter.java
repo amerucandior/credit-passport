@@ -1,8 +1,7 @@
 package com.passport.creditpassport.config;
 
-import com.passport.creditpassport.auth.models.User;
-import com.passport.creditpassport.auth.repository.UsersRepository;
-import com.passport.creditpassport.auth.security.JwtService;
+import com.passport.creditpassport.auth.AuthenticatedUserLookupPort;
+import com.passport.creditpassport.auth.JwtTokenPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,15 +16,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.util.Collections;
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    private final UsersRepository usersRepository;
+    private final JwtTokenPort jwtTokenPort;
+    private final AuthenticatedUserLookupPort authenticatedUserLookupPort;
 
     @Override
     protected void doFilterInternal(
@@ -52,12 +50,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String userId;
 
         try {
-            if (!jwtService.validateToken(token)) {
+            if (!jwtTokenPort.validateToken(token)) {
                 log.debug("JWT validation failed on path {}", request.getRequestURI());
                 filterChain.doFilter(request, response);
                 return;
             }
-            userId = jwtService.extractSubject(token);
+            userId = jwtTokenPort.extractSubject(token);
         } catch (Exception e) {
             log.debug("Could not process JWT: {}", e.getMessage());
             filterChain.doFilter(request, response);
@@ -73,22 +71,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 5. Confirm the user still exists.
         //    Subject = entity UUID primary key → findById is unambiguous.
         //    Deactivated/deleted accounts are rejected here regardless of token expiry.
-        Optional<User> maybeUser = usersRepository.findById(userId);
-
-        if (maybeUser.isEmpty()) {
+        var authenticatedUser = authenticatedUserLookupPort.findById(userId);
+        if (authenticatedUser.isEmpty()) {
             log.debug("JWT subject '{}' not found in database", userId);
             filterChain.doFilter(request, response);
             return;
         }
-
-        User authenticatedUser = maybeUser.get();
 
         // 6. Build an authenticated token.
         //    Three-arg constructor → isAuthenticated() == true.
         //    credentials = null — password not needed after JWT validation.
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(
-                        authenticatedUser,
+                        authenticatedUser.get(),
                         null,
                         Collections.emptyList()
                 );

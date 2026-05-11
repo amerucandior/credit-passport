@@ -16,6 +16,5 @@ public interface UsersRepository extends JpaRepository<User, String> {
 
     Optional<User> findByEmailOrNatId(String email, String natId);
     Optional<User> findByEmail(String email);
-
-    // Used by creditpassport service to get the users credit-passport
-    Optional<User> findByNatId(String natId);}
+    Optional<User> findByNatId(String natId);
+}

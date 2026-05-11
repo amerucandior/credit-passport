@@ -1,5 +1,6 @@
 package com.passport.creditpassport.auth.security;
 
+import com.passport.creditpassport.auth.JwtTokenPort;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,7 +13,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class JwtService {
+public class JwtService implements JwtTokenPort {
 
     @Value("${spring.security.jwt.secret}")
     private String jwtSecret;

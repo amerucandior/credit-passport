@@ -2,7 +2,7 @@ package com.passport.creditpassport.lender.lendercontroller;
 
 
 import com.passport.creditpassport.creditpassport.CreditPassport;
-import com.passport.creditpassport.creditpassport.creditservice.CreditService;
+import com.passport.creditpassport.creditpassport.CreditPassportQueryPort;
 import com.passport.creditpassport.lender.lenderdto.CreditPassportRequest;
 import com.passport.creditpassport.lender.lenderdto.LenderRequest;
 import com.passport.creditpassport.lender.lenderdto.LenderResponse;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class LenderController {
 
     private final LenderService lenderService;
-    private final CreditService creditService;
+    private final CreditPassportQueryPort creditPassportQueryPort;
 
     @PostMapping("/register")
     public ResponseEntity<LenderResponse> register(@Valid @RequestBody LenderRequest request) {
@@ -47,11 +47,11 @@ public class LenderController {
 
         // 2. Verify the cbkLicenseNo in the body belongs to the authenticated lender.
         //    Guards against a valid key being used with a different licence number.
-        if (!lender.getCbkLicenseNo().equals(req.getCbkLicenseNo())) {
+        if (!lender.getCbkLicenseNo().equals(req.cbkLicenseNo())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         // 3. Fetch and return the credit passport.
-        CreditPassport passport = creditService.getCreditPassport(req.getNationalId());
+        CreditPassport passport = creditPassportQueryPort.getCreditPassport(req.nationalId());
         return ResponseEntity.ok(passport);
     }
 

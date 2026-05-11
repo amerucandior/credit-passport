@@ -10,11 +10,11 @@ public class DocumentProofValidator implements ConstraintValidator<ValidDocument
     public boolean isValid(LenderRequest request, ConstraintValidatorContext context) {
         if (request == null) return true;
 
-        boolean hasCertOfIncorporation = request.getCertificateOfIncorporation() != null
-                && !request.getCertificateOfIncorporation().isBlank();
+        boolean hasCertOfIncorporation = request.certificateOfIncorporation() != null
+                && !request.certificateOfIncorporation().isBlank();
 
-        boolean hasNameApprovalProof = request.getNameApprovalProof() != null
-                && !request.getNameApprovalProof().isBlank();
+        boolean hasNameApprovalProof = request.nameApprovalProof() != null
+                && !request.nameApprovalProof().isBlank();
 
         if (!hasCertOfIncorporation && !hasNameApprovalProof) {
             // Points the error at nameApprovalProof field instead of the whole object

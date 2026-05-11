@@ -6,14 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class CreditPassportRequest {
+public record CreditPassportRequest (
 
     @NotBlank
-    private String cbkLicenseNo;
+    String cbkLicenseNo,
 
     @NotBlank
-    private String nationalId;
-}
+    String nationalId
+) {}

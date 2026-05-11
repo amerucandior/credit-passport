@@ -7,36 +7,29 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 public class OtpRequest {
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class VerifyOtpRequest {
+
+    public static record VerifyOtpRequest (
         @Schema(description = "Email address that received the OTP", example = "johndoe@example.com")
         @NotBlank
         @Email
-        private String email;
+        String email,
 
         @Schema(description = "Six-digit OTP code from email", example = "824436")
         @NotBlank
         @Pattern(regexp = "\\d{6}", message = "OTP must be exactly 6 digits")
-        private String otp;
-    }
+        String otp
+        ) {}
 
     /**
      * Used by the resend-OTP endpoint — only an email address is needed.
      */
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
+
     @Builder
-    public static class EmailOnlyRequest {
+    public static record EmailOnlyRequest (
 
         @Schema(description = "Email address for the unverified account", example = "johndoe@example.com")
         @NotBlank
         @Email
-        private String email;
-    }
-
+        String email
+    ) {}
 }

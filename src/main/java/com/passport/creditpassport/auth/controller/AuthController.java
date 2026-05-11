@@ -50,7 +50,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
-        registrationOtpImpl.sendRegistrationOtp(request.getEmail());
+        registrationOtpImpl.sendRegistrationOtp(request.email());
         return ResponseEntity.ok().build();
     }
 
@@ -71,7 +71,7 @@ public class AuthController {
     @PostMapping("/verify-registration")
     public ResponseEntity<Void> verifyRegistration(
             @Valid @RequestBody OtpRequest.VerifyOtpRequest req) {
-        registrationOtpImpl.verifyRegistrationOtp(req.getEmail(), req.getOtp());
+        registrationOtpImpl.verifyRegistrationOtp(req.email(), req.otp());
         return ResponseEntity.ok().build();
     }
 
@@ -93,7 +93,7 @@ public class AuthController {
     @PostMapping("/resend-registration-otp")
     public ResponseEntity<Void> resendRegistrationOtp(
             @Valid @RequestBody OtpRequest.EmailOnlyRequest req) {
-        registrationOtpImpl.resendRegistrationOtp(req.getEmail());
+        registrationOtpImpl.resendRegistrationOtp(req.email());
         return ResponseEntity.ok().build();
     }
 
@@ -119,7 +119,7 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request) {
-        loginOtpImpl.initiateLogin(request.getIdentifier(), request.getUserPassword());
+        loginOtpImpl.initiateLogin(request.identifier(), request.userPassword());
         return ResponseEntity.ok().build();
     }
 
@@ -137,7 +137,7 @@ public class AuthController {
     @PostMapping("/verify-login")
     public ResponseEntity<AuthResponse> verifyLogin(
             @Valid @RequestBody OtpRequest.VerifyOtpRequest req) {
-        AuthResponse response = loginOtpImpl.verifyLoginOtp(req.getEmail(), req.getOtp());
+        AuthResponse response = loginOtpImpl.verifyLoginOtp(req.email(), req.otp());
         return ResponseEntity.ok(response);
     }
 }

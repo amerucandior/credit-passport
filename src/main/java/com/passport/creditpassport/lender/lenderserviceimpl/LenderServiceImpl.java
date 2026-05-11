@@ -22,26 +22,26 @@ public class LenderServiceImpl implements LenderService {
     @Override
     public LenderResponse registerLender(LenderRequest request) {
         // Duplicate Checks
-        if (lenderRepository.existsByCbkLicenseNo(request.getCbkLicenseNo())) {
+        if (lenderRepository.existsByCbkLicenseNo(request.cbkLicenseNo())) {
             throw new IllegalArgumentException("A lender with this CBK License Number already exists");
         }
 
-        if (request.getCertificateOfIncorporation() != null &&
-                lenderRepository.existsByCertificateOfIncorporation(request.getCertificateOfIncorporation())) {
+        if (request.certificateOfIncorporation() != null &&
+                lenderRepository.existsByCertificateOfIncorporation(request.certificateOfIncorporation())) {
             throw new IllegalArgumentException("A lender with this Certificate of Incorporation already exists");
         }
 
-        if (lenderRepository.existsByRegBusinessAddress(request.getRegBusinessAddress())) {
+        if (lenderRepository.existsByRegBusinessAddress(request.regBusinessAddress())) {
             throw new IllegalArgumentException("A lender with this registered business address already exists");
         }
 
-        if (request.getNameApprovalProof() != null &&
-                lenderRepository.existsByNameApprovalProof(request.getNameApprovalProof())) {
+        if (request.nameApprovalProof() != null &&
+                lenderRepository.existsByNameApprovalProof(request.nameApprovalProof())) {
             throw new IllegalArgumentException("A lender with this Name Approval Proof already exists");
         }
 
-        if (request.getMemorandumArticlesOfAssociation() != null &&
-                lenderRepository.existsByMemorandumArticlesOfAssociation(request.getMemorandumArticlesOfAssociation())) {
+        if (request.memorandumArticlesOfAssociation() != null &&
+                lenderRepository.existsByMemorandumArticlesOfAssociation(request.memorandumArticlesOfAssociation())) {
             throw new IllegalArgumentException("A lender with this Memorandum of Association already exists");
         }
 
@@ -50,12 +50,12 @@ public class LenderServiceImpl implements LenderService {
 
         // Map request to entity
         Lender lender = new Lender();
-        lender.setLenderName(request.getLenderName());
-        lender.setCbkLicenseNo(request.getCbkLicenseNo());
-        lender.setCertificateOfIncorporation(request.getCertificateOfIncorporation());
-        lender.setMemorandumArticlesOfAssociation(request.getMemorandumArticlesOfAssociation());
-        lender.setRegBusinessAddress(request.getRegBusinessAddress());
-        lender.setNameApprovalProof(request.getNameApprovalProof());
+        lender.setLenderName(request.lenderName());
+        lender.setCbkLicenseNo(request.cbkLicenseNo());
+        lender.setCertificateOfIncorporation(request.certificateOfIncorporation());
+        lender.setMemorandumArticlesOfAssociation(request.memorandumArticlesOfAssociation());
+        lender.setRegBusinessAddress(request.regBusinessAddress());
+        lender.setNameApprovalProof(request.nameApprovalProof());
         lender.setApiKey(ApiKeyUtil.hash(apiKey));
 
         lenderRepository.save(lender);
@@ -64,7 +64,7 @@ public class LenderServiceImpl implements LenderService {
                 .apiKey(apiKey)
                 .message(String.format(
                                 "%s registered successfully. Store your API key safely - it will not be shown again.",
-                                request.getLenderName()))
+                                request.lenderName()))
                 .build();
     }
 }
