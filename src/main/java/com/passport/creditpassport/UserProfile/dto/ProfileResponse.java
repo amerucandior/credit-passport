@@ -32,6 +32,7 @@ public class ProfileResponse {
     public static ProfileResponse fromEntity(UserProfile profile) {
         return ProfileResponse.builder()
                 .profileId(profile.getProfileId())
+                .userId(profile.getUserId())
                 .gender(profile.getGender())
                 .employmentStatus(profile.getEmploymentStatus())
                 .employerName(profile.getEmployerName())

@@ -6,6 +6,7 @@ import com.passport.creditpassport.config.SecurityConfig;
 import com.passport.creditpassport.exception.GlobalExceptionHandler;
 import com.passport.creditpassport.exception.InvalidProfilePhotoUrlException;
 import com.passport.creditpassport.exception.ProfileAlreadyExistsException;
+import com.passport.creditpassport.lender.security.ApiKeyAuthFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 @org.springframework.context.annotation.ComponentScan.Filter(
                         type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
                 @org.springframework.context.annotation.ComponentScan.Filter(
-                        type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class)
+                        type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class),
+                @org.springframework.context.annotation.ComponentScan.Filter(
+                        type = FilterType.ASSIGNABLE_TYPE, classes = ApiKeyAuthFilter.class)
         })
 @Import({GlobalExceptionHandler.class, ProfileControllerErrorHandlingTest.MockConfig.class})
 class ProfileControllerErrorHandlingTest {

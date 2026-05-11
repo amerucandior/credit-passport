@@ -5,7 +5,6 @@ import com.passport.creditpassport.UserProfile.dto.UpdateProfileRequest;
 import com.passport.creditpassport.UserProfile.repository.ProfileRepository;
 import com.passport.creditpassport.UserProfile.service.ProfileService;
 import com.passport.creditpassport.UserProfile.models.UserProfile;
-import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.exception.InvalidProfilePhotoUrlException;
 import com.passport.creditpassport.exception.ProfileAlreadyExistsException;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
@@ -43,24 +42,22 @@ public class ProfileServiceImpl implements ProfileService{
 
     @Override
     @Transactional
-    public ProfileResponse createProfile(User authenticatedUser, UpdateProfileRequest request) {
+    public ProfileResponse createProfile(String userId, UpdateProfileRequest request) {
 
-        String userId = authenticatedUser.getId();
-
-        if (profileRepository.existsByUser_Id(userId)) {
+        if (profileRepository.existsByUserId(userId)) {
             throw new ProfileAlreadyExistsException(userId);
         }
 
-        UserProfile userProfile = getUserProfile(request, authenticatedUser);
+        UserProfile userProfile = getUserProfile(request, userId);
 
         UserProfile saved = profileRepository.save(userProfile);
         log.info("Profile created for userId {}", userId);
         return ProfileResponse.fromEntity(saved);
     }
 
-    private static @NonNull UserProfile getUserProfile(UpdateProfileRequest request, User authenticatedUser) {
+    private static @NonNull UserProfile getUserProfile(UpdateProfileRequest request, String userId) {
         UserProfile userProfile = new UserProfile();
-        userProfile.setUser(authenticatedUser);
+        userProfile.setUserId(userId);
         userProfile.setGender(request.getGender());
         userProfile.setDateOfBirth(request.getDateOfBirth());
         userProfile.setEmployerName(
@@ -79,10 +76,8 @@ public class ProfileServiceImpl implements ProfileService{
     //    Read user profile
     @Transactional(readOnly = true)
     @Override
-    public ProfileResponse getProfile(User authenticatedUser) {
-        String userId = authenticatedUser.getId();
-
-        UserProfile profile = profileRepository.findByUser_Id(userId)
+    public ProfileResponse getProfile(String userId) {
+        UserProfile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
 
         return ProfileResponse.fromEntity(profile);
@@ -90,10 +85,8 @@ public class ProfileServiceImpl implements ProfileService{
 
     @Override
     @Transactional
-    public ProfileResponse updateProfile(User authenticatedUser, UpdateProfileRequest request) {
-        String userId = authenticatedUser.getId();
-
-        UserProfile profile = profileRepository.findByUser_Id(userId)
+    public ProfileResponse updateProfile(String userId, UpdateProfileRequest request) {
+        UserProfile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Profile not found — create one first."));
 

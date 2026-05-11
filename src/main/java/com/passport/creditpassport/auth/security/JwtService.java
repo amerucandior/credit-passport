@@ -1,4 +1,4 @@
-package com.passport.creditpassport.config;
+package com.passport.creditpassport.auth.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -22,8 +22,7 @@ public class JwtService {
 
     private static final String JWT_ISSUER = "credit-passport";
 
-    // Key
-
+    // Secret Key
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }

@@ -2,6 +2,7 @@ package com.passport.creditpassport.config;
 
 import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.repository.UsersRepository;
+import com.passport.creditpassport.auth.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

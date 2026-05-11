@@ -36,3 +36,4 @@ build/
 
 ## environments
 .env
+application.yml
