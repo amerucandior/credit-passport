@@ -59,11 +59,13 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
         } catch (DataIntegrityViolationException e) {
             log.warn("Duplicate value detected during registration: {}", e.getMessage());
             String msg = e.getMostSpecificCause().getMessage().toLowerCase();
-            if (msg.contains("user_name"))        throw new NameAlreadyExistsException(request.name());
-            else if (msg.contains("national_id")) throw new NationalIdAlreadyExistsException(request.userNationalId());
-            else if (msg.contains("user_no"))     throw new NumberAlreadyExistsException(request.number());
-            else if (msg.contains("email"))       throw new EmailAlreadyExistsException(request.email());
-            else                                  throw new DuplicateAuthExceptions("User already exists");
+            throw switch (msg) {
+                case String m when m.contains("user_name") -> new NameAlreadyExistsException(request.name());
+                case String m when m.contains("national_id") -> new NationalIdAlreadyExistsException(request.userNationalId());
+                case String m when m.contains("user_no") -> new NumberAlreadyExistsException(request.number());
+                case String m when m.contains("email") -> new EmailAlreadyExistsException(request.email());
+                default -> new DuplicateAuthExceptions("User already exists");
+            };
         }
     }
 

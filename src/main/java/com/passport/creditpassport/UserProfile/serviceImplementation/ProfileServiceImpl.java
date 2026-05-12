@@ -58,18 +58,18 @@ public class ProfileServiceImpl implements ProfileService{
     private static @NonNull UserProfile getUserProfile(UpdateProfileRequest request, String userId) {
         UserProfile userProfile = new UserProfile();
         userProfile.setUserId(userId);
-        userProfile.setGender(request.getGender());
-        userProfile.setDateOfBirth(request.getDateOfBirth());
+        userProfile.setGender(request.gender());
+        userProfile.setDateOfBirth(request.dateOfBirth());
         userProfile.setEmployerName(
-                StringEscapeUtils.escapeHtml4(request.getEmployerName()));
-        userProfile.setEmploymentStatus(request.getEmploymentStatus());
+                StringEscapeUtils.escapeHtml4(request.employerName()));
+        userProfile.setEmploymentStatus(request.employmentStatus());
         userProfile.setOccupation(
-                StringEscapeUtils.escapeHtml4(request.getOccupation()));
+                StringEscapeUtils.escapeHtml4(request.occupation()));
         userProfile.setSaccoName(
-                StringEscapeUtils.escapeHtml4(request.getSaccoName()));
-        userProfile.setMonthlyIncomeKes(request.getMonthlyIncomeKes());
+                StringEscapeUtils.escapeHtml4(request.saccoName()));
+        userProfile.setMonthlyIncomeKes(request.monthlyIncomeKes());
         userProfile.setProfilePhotoUrl(
-                sanitizeUrl(request.getProfilePhotoUrl()));
+                sanitizeUrl(request.profilePhotoUrl()));
         return userProfile;
     }
 
@@ -91,18 +91,18 @@ public class ProfileServiceImpl implements ProfileService{
                         "Profile not found — create one first."));
 
         // Only overwrite fields that were actually supplied
-        if (request.getGender()           != null) profile.setGender(request.getGender());
-        if (request.getDateOfBirth()      != null) profile.setDateOfBirth(request.getDateOfBirth());
-        if (request.getEmployerName()    != null) profile.setEmployerName(
-                StringEscapeUtils.escapeHtml4(request.getEmployerName()));
-        if (request.getOccupation()      != null) profile.setOccupation(
-                StringEscapeUtils.escapeHtml4(request.getOccupation()));
-        if (request.getSaccoName()       != null) profile.setSaccoName(
-                StringEscapeUtils.escapeHtml4(request.getSaccoName()));
-        if (request.getEmploymentStatus() != null) profile.setEmploymentStatus(request.getEmploymentStatus());
-        if (request.getMonthlyIncomeKes() != null) profile.setMonthlyIncomeKes(request.getMonthlyIncomeKes());
-        if (request.getProfilePhotoUrl() != null) profile.setProfilePhotoUrl(
-                sanitizeUrl(request.getProfilePhotoUrl()));
+        if (request.gender()           != null) profile.setGender(request.gender());
+        if (request.dateOfBirth()      != null) profile.setDateOfBirth(request.dateOfBirth());
+        if (request.employerName()    != null) profile.setEmployerName(
+                StringEscapeUtils.escapeHtml4(request.employerName()));
+        if (request.occupation()      != null) profile.setOccupation(
+                StringEscapeUtils.escapeHtml4(request.occupation()));
+        if (request.saccoName()       != null) profile.setSaccoName(
+                StringEscapeUtils.escapeHtml4(request.saccoName()));
+        if (request.employmentStatus() != null) profile.setEmploymentStatus(request.employmentStatus());
+        if (request.monthlyIncomeKes() != null) profile.setMonthlyIncomeKes(request.monthlyIncomeKes());
+        if (request.profilePhotoUrl() != null) profile.setProfilePhotoUrl(
+                sanitizeUrl(request.profilePhotoUrl()));
         UserProfile saved = profileRepository.save(profile);
         log.info("Profile updated for userId {}", userId);
         return ProfileResponse.fromEntity(saved);
