@@ -18,7 +18,6 @@ public record LenderRequest(
         String certificateOfIncorporation,
 
         @Schema(description = "Memorandum Articles of Association sets the company's identity and scope. treated as the primary lens for assessing whether your entity is structurally fit to lend.")
-        @NotBlank
         String memorandumArticlesOfAssociation,
 
         @Schema(description = "Registered business address of the company")
