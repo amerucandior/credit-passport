@@ -1,6 +1,6 @@
 package com.passport.creditpassport.lender.lendercontroller;
 
-import com.passport.creditpassport.creditpassport.CreditPassport;
+import com.passport.creditpassport.creditpassport.model.CreditPassport;
 import com.passport.creditpassport.creditpassport.CreditPassportQueryPort;
 import com.passport.creditpassport.lender.lenderdto.LenderResponse;
 import com.passport.creditpassport.lender.lendermodel.Lender;

@@ -12,38 +12,35 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 
-
-@Data
-@Builder
-public class ProfileResponse {
-    private String profileId;
-    private String userId;
-    private LocalDate dateOfBirth;
-    private Gender gender;
-    private EmploymentStatus employmentStatus;
-    private String employerName;
-    private String occupation;
-    private String saccoName;
-    private BigDecimal monthlyIncomeKes;
-    private String profilePhotoUrl;
-    private Instant createdAt;
-    private Instant updatedAt;
+public record ProfileResponse(
+        String profileId,
+        String userId,
+        LocalDate dateOfBirth,
+        Gender gender,
+        EmploymentStatus employmentStatus,
+        String employerName,
+        String occupation,
+        String saccoName,
+        BigDecimal monthlyIncomeKes,
+        String profilePhotoUrl,
+        Instant createdAt,
+        Instant updatedAt) {
 
     public static ProfileResponse fromEntity(UserProfile profile) {
-        return ProfileResponse.builder()
-                .profileId(profile.getProfileId())
-                .userId(profile.getUserId())
-                .gender(profile.getGender())
-                .employmentStatus(profile.getEmploymentStatus())
-                .employerName(profile.getEmployerName())
-                .occupation(profile.getOccupation())
-                .saccoName(profile.getSaccoName())
-                .dateOfBirth(profile.getDateOfBirth())
-                .monthlyIncomeKes(profile.getMonthlyIncomeKes())
-                .profilePhotoUrl(profile.getProfilePhotoUrl())
-                .createdAt(profile.getCreatedAt())
-                .updatedAt(profile.getUpdatedAt())
-                .build();
+        return new ProfileResponse(
+                profile.getProfileId(),
+                profile.getUserId(),
+                profile.getDateOfBirth(),
+                profile.getGender(),
+                profile.getEmploymentStatus(),
+                profile.getEmployerName(),
+                profile.getOccupation(),
+                profile.getSaccoName(),
+                profile.getMonthlyIncomeKes(),
+                profile.getProfilePhotoUrl(),
+                profile.getCreatedAt(),
+                profile.getUpdatedAt()
+        );
     }
 }
 

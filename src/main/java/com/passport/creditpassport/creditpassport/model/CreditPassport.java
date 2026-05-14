@@ -1,4 +1,4 @@
-package com.passport.creditpassport.creditpassport;
+package com.passport.creditpassport.creditpassport.model;
 //Credit-passport model
 import jakarta.persistence.*;
 import lombok.Getter;

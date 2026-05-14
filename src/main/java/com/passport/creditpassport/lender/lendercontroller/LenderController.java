@@ -1,7 +1,7 @@
 package com.passport.creditpassport.lender.lendercontroller;
 
 
-import com.passport.creditpassport.creditpassport.CreditPassport;
+import com.passport.creditpassport.creditpassport.model.CreditPassport;
 import com.passport.creditpassport.creditpassport.CreditPassportQueryPort;
 import com.passport.creditpassport.lender.lenderdto.CreditPassportRequest;
 import com.passport.creditpassport.lender.lenderdto.LenderRequest;
@@ -37,7 +37,7 @@ public class LenderController {
     @SecurityRequirement(name = "bearerAuth")
     @SecurityRequirement(name = "apiKeyAuth")
     @PostMapping("/credit-passport")
-    public ResponseEntity<CreditPassport> getCreditPassport(
+    public ResponseEntity<CreditPassport> getCreditPassport( // todo: make modular
         @Valid @RequestBody CreditPassportRequest req,
         HttpServletRequest httpRequest) {
 

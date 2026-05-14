@@ -1,6 +1,6 @@
 package com.passport.creditpassport.creditpassport.creditserviceImpl;
 
-import com.passport.creditpassport.creditpassport.CreditPassport;
+import com.passport.creditpassport.creditpassport.model.CreditPassport;
 import com.passport.creditpassport.creditpassport.CreditPassportQueryPort;
 import com.passport.creditpassport.creditpassport.AuthUserLookupPort;
 import com.passport.creditpassport.creditpassport.repository.CreditPassportRepository;
