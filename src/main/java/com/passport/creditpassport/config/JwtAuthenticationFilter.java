@@ -1,7 +1,8 @@
 package com.passport.creditpassport.config;
 
-import com.passport.creditpassport.auth.AuthenticatedUserLookupPort;
-import com.passport.creditpassport.auth.JwtTokenPort;
+import com.passport.creditpassport.auth.AuthenticatedUserPrincipal;
+import com.passport.creditpassport.auth.JwtService;
+import com.passport.creditpassport.auth.UsersRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,16 +15,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import java.util.Collections;
+
 import java.io.IOException;
+import java.util.Collections;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenPort jwtTokenPort;
-    private final AuthenticatedUserLookupPort authenticatedUserLookupPort;
+    private final JwtService jwtService;
+    private final UsersRepository usersRepository;
 
     @Override
     protected void doFilterInternal(
@@ -50,12 +52,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String userId;
 
         try {
-            if (!jwtTokenPort.validateToken(token)) {
+            if (!jwtService.validateToken(token)) {
                 log.debug("JWT validation failed on path {}", request.getRequestURI());
                 filterChain.doFilter(request, response);
                 return;
             }
-            userId = jwtTokenPort.extractSubject(token);
+            userId = jwtService.extractSubject(token);
         } catch (Exception e) {
             log.debug("Could not process JWT: {}", e.getMessage());
             filterChain.doFilter(request, response);
@@ -69,10 +71,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 5. Confirm the user still exists.
-        //    Subject = entity UUID primary key → findById is unambiguous.
+        //    Subject = entity UUID primary key → existsById is unambiguous.
         //    Deactivated/deleted accounts are rejected here regardless of token expiry.
-        var authenticatedUser = authenticatedUserLookupPort.findById(userId);
-        if (authenticatedUser.isEmpty()) {
+        if (!usersRepository.existsById(userId)) {
             log.debug("JWT subject '{}' not found in database", userId);
             filterChain.doFilter(request, response);
             return;
@@ -83,7 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //    credentials = null — password not needed after JWT validation.
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(
-                        authenticatedUser.get(),
+                        new AuthenticatedUserPrincipal(userId),
                         null,
                         Collections.emptyList()
                 );

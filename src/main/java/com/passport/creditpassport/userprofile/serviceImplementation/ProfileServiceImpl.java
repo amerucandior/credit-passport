@@ -1,10 +1,10 @@
-package com.passport.creditpassport.UserProfile.serviceImplementation;
+package com.passport.creditpassport.userprofile.serviceImplementation;
 
-import com.passport.creditpassport.UserProfile.dto.ProfileResponse;
-import com.passport.creditpassport.UserProfile.dto.UpdateProfileRequest;
-import com.passport.creditpassport.UserProfile.repository.ProfileRepository;
-import com.passport.creditpassport.UserProfile.service.ProfileService;
-import com.passport.creditpassport.UserProfile.models.UserProfile;
+import com.passport.creditpassport.userprofile.dto.ProfileResponse;
+import com.passport.creditpassport.userprofile.dto.UpdateProfileRequest;
+import com.passport.creditpassport.userprofile.repository.ProfileRepository;
+import com.passport.creditpassport.userprofile.service.ProfileService;
+import com.passport.creditpassport.userprofile.models.UserProfile;
 import com.passport.creditpassport.exception.InvalidProfilePhotoUrlException;
 import com.passport.creditpassport.exception.ProfileAlreadyExistsException;
 import com.passport.creditpassport.exception.ResourceNotFoundException;

@@ -1,10 +1,8 @@
-package com.passport.creditpassport.UserProfile.dto;
+package com.passport.creditpassport.userprofile.dto;
 
-import com.passport.creditpassport.UserProfile.models.EmploymentStatus;
-import com.passport.creditpassport.UserProfile.models.Gender;
-import com.passport.creditpassport.UserProfile.models.UserProfile;
-import lombok.Builder;
-import lombok.Data;
+import com.passport.creditpassport.userprofile.models.EmploymentStatus;
+import com.passport.creditpassport.userprofile.models.Gender;
+import com.passport.creditpassport.userprofile.models.UserProfile;
 
 
 import java.math.BigDecimal;

@@ -1,6 +1,6 @@
-package com.passport.creditpassport.UserProfile.repository;
+package com.passport.creditpassport.userprofile.repository;
 
-import com.passport.creditpassport.UserProfile.models.UserProfile;
+import com.passport.creditpassport.userprofile.models.UserProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

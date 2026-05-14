@@ -1,12 +1,10 @@
-package com.passport.creditpassport.UserProfile.dto;
+package com.passport.creditpassport.userprofile.dto;
 
 
-import com.passport.creditpassport.UserProfile.models.EmploymentStatus;
-import com.passport.creditpassport.UserProfile.models.Gender;
+import com.passport.creditpassport.userprofile.models.EmploymentStatus;
+import com.passport.creditpassport.userprofile.models.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;

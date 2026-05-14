@@ -1,5 +1,6 @@
 package com.passport.creditpassport.statement.serviceimpl;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.passport.creditpassport.exception.InvalidFileException;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
 import com.passport.creditpassport.service.CloudinaryService;
@@ -8,15 +9,17 @@ import com.passport.creditpassport.statement.enums.StatementType;
 import com.passport.creditpassport.statement.models.Statement;
 import com.passport.creditpassport.statement.repository.FinanceRepository;
 import com.passport.creditpassport.statement.service.FinancialStatementService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.UnknownNullability;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -31,12 +34,11 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
     private static final long   MAX_SIZE_BYTES = 10 * 1024 * 1024L;
 
     @Override
-    @Transactional
-    public FinancialStatementResponse upload(String userId, MultipartFile file, @UnknownNullability StatementType type) {
+    public FinancialStatementResponse upload(String userId, MultipartFile file, @NotNull StatementType type) {
         validateStatement(file);
 
         String publicId = "stmt_" + userId + "_" + type.name().toLowerCase()
-                + "_" + System.currentTimeMillis();
+                + "_" + UuidCreator.getTimeOrderedEpoch();
         String folder = FOLDER + "/" + userId;
 
         Map<String, Object> result = cloudinaryService.uploadFile(file, folder, publicId);
@@ -47,7 +49,6 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
                 .cloudinaryPublicId((String) result.get("public_id"))
                 .statementUrl((String) result.get("secure_url"))
                 .originalFilename(file.getOriginalFilename())
-                // .fileSize()
                 .build();
 
         financeRepository.save(statement);
@@ -57,7 +58,6 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
 
     @Override
     public List<FinancialStatementResponse> getAllByUser(String userId) {
-        // was findById(id) — id undefined, wrong method entirely
         return financeRepository.findByUserId(userId)
                 .stream()
                 .map(FinancialStatementResponse::from)
@@ -65,29 +65,36 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
     }
 
     @Override
-    public FinancialStatementResponse getById(UUID statementId) {
-        // was findById(id) — id undefined; param type was Long, now UUID
-        return financeRepository.findById(statementId)
+    @Transactional(readOnly = true)
+    public FinancialStatementResponse getById(String userId, UUID id) {
+        return financeRepository.findByIdAndUserId(id, userId)
                 .map(FinancialStatementResponse::from)
                 .orElseThrow(() -> new ResourceNotFoundException("Statement not found"));
     }
 
     @Override
     @Transactional
-    public void delete(UUID statementId) {
-        Statement statement = financeRepository.findById(statementId)
+    public void delete(String userId, UUID id) {
+        Statement statement = financeRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Statement not found"));
 
         cloudinaryService.deleteFile(statement.getCloudinaryPublicId());
         financeRepository.delete(statement);
     }
-
+    @Contract("null -> fail")
     private void validateStatement(MultipartFile file) {
         if (file == null || file.isEmpty())
             throw new InvalidFileException("File cannot be empty");
         if (file.getSize() > MAX_SIZE_BYTES)
             throw new InvalidFileException("File exceeds 10MB limit");
-        if (!"application/pdf".equals(file.getContentType()) || (!"text/csv".equals(file.getContentType()) || !"application/vnd.ms-excel".equals(file.getContentType()) ||!"\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".equals(file.getContentType())))
+        if (!ALLOWED_TYPES.contains(file.getContentType()))
             throw new InvalidFileException("Unsupported file type. Allowed: PDF, CSV, XLSX");
     }
+
+    private static final Set<String> ALLOWED_TYPES = Set.of(
+            "application/pdf",
+            "text/csv",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
 }

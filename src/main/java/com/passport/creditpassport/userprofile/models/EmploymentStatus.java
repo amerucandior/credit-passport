@@ -1,4 +1,4 @@
-package com.passport.creditpassport.UserProfile.models;
+package com.passport.creditpassport.userprofile.models;
 
 public enum EmploymentStatus {
     EMPLOYED,

@@ -1,7 +1,7 @@
-package com.passport.creditpassport.UserProfile.service;
+package com.passport.creditpassport.userprofile.service;
 
-import com.passport.creditpassport.UserProfile.dto.ProfileResponse;
-import com.passport.creditpassport.UserProfile.dto.UpdateProfileRequest;
+import com.passport.creditpassport.userprofile.dto.ProfileResponse;
+import com.passport.creditpassport.userprofile.dto.UpdateProfileRequest;
 
 public interface ProfileService {
     ProfileResponse createProfile(String userId, UpdateProfileRequest request);

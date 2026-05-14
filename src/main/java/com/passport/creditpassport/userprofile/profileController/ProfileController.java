@@ -1,8 +1,9 @@
-package com.passport.creditpassport.UserProfile.profileController;
+package com.passport.creditpassport.userprofile.profileController;
 
-import com.passport.creditpassport.UserProfile.dto.UpdateProfileRequest;
-import com.passport.creditpassport.UserProfile.dto.ProfileResponse;
-import com.passport.creditpassport.UserProfile.service.ProfileService;
+import com.passport.creditpassport.auth.AuthenticatedUserPrincipal;
+import com.passport.creditpassport.userprofile.dto.UpdateProfileRequest;
+import com.passport.creditpassport.userprofile.dto.ProfileResponse;
+import com.passport.creditpassport.userprofile.service.ProfileService;
 import com.passport.creditpassport.exception.GlobalExceptionHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Profile", description = "User profile management")
@@ -49,9 +51,9 @@ public class ProfileController {
     @PostMapping
     @SuppressWarnings("java:S5131") // XSS sanitized in ProfileService.createProfile() via StringEscapeUtils + OWASP policy
     public ResponseEntity<ProfileResponse> createProfile(
-            Authentication authentication,
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @Valid @RequestBody UpdateProfileRequest request) {
-        ProfileResponse response = profileService.createProfile(resolveAuthenticatedUserId(authentication), request);
+        ProfileResponse response = profileService.createProfile(principal.id(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -68,8 +70,8 @@ public class ProfileController {
     })
     @GetMapping
     public ResponseEntity<ProfileResponse> getProfile(
-            Authentication authentication) {
-        return ResponseEntity.ok(profileService.getProfile(resolveAuthenticatedUserId(authentication)));
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
+        return ResponseEntity.ok(profileService.getProfile(principal.id());
     }
 
     @Operation(summary = "Update your profile")
@@ -90,17 +92,8 @@ public class ProfileController {
     })
     @PatchMapping
     public ResponseEntity<ProfileResponse> updateProfile(
-            Authentication authentication,
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @Valid @RequestBody UpdateProfileRequest request) {
-        return ResponseEntity.ok(profileService.updateProfile(resolveAuthenticatedUserId(authentication), request));
-    }
-
-    private String resolveAuthenticatedUserId(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-        try {
-            return (String) principal.getClass().getMethod("getId").invoke(principal);
-        } catch (ReflectiveOperationException ignored) {
-            return authentication.getName();
-        }
+        return ResponseEntity.ok(profileService.updateProfile(principal.id(), request));
     }
 }

@@ -1,5 +1,6 @@
 package com.passport.creditpassport.statement.models;
 
+import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.statement.enums.StatementType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,8 +24,18 @@ public class Statement {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id = UuidCreator.getTimeOrderedEpoch();
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false, updatable = false)
     private String userId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "user_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(name = "fk_statements_user")
+    )
+    private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statement_type", nullable = false)
@@ -34,7 +45,7 @@ public class Statement {
     private String institutionHint;
 
     // extracted from the uploaded file on upload
-    @Column(name = "original_filename", nullable = false)
+    @Column(name = "original_filename")
     private String originalFilename;
 
     @Column(name = "cloudinary_public_id")

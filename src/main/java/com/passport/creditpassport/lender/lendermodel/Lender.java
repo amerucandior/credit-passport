@@ -56,4 +56,5 @@ public class Lender {
 
     @Column(nullable = false)
     private boolean enabled = false;    // becomes true after lender meets requirements
+    // used in future to soft block lenders from accessing credit-passports
 }

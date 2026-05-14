@@ -10,6 +10,6 @@ import java.util.UUID;
 public interface FinancialStatementService {
     FinancialStatementResponse upload(String userId, MultipartFile file, StatementType type);
     List<FinancialStatementResponse> getAllByUser(String userId);
-    FinancialStatementResponse getById(UUID statementId);
-    void delete(UUID statementId);
+    FinancialStatementResponse getById(String userId, UUID id);
+    void delete(String userId, UUID id);
 }

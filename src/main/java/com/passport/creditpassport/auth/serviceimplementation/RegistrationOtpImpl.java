@@ -3,7 +3,7 @@ package com.passport.creditpassport.auth.serviceimplementation;
 import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpUtils;
-import com.passport.creditpassport.auth.repository.UsersRepository;
+import com.passport.creditpassport.auth.UsersRepository;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
