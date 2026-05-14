@@ -1,5 +1,6 @@
 package com.passport.creditpassport.userprofile.models;
 
+import com.passport.creditpassport.auth.models.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,8 +24,18 @@ public class UserProfile {
     @Column(name = "profile_id")
     private String profileId;
 
-    @Column(name = "user_id", nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false, updatable = false)
     private String userId;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "user_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(name = "fk_user_profile")
+    )
+    private User user;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;

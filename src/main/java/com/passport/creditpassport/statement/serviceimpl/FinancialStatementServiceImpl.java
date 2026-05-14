@@ -41,21 +41,32 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
                 + "_" + UuidCreator.getTimeOrderedEpoch();
         String folder = FOLDER + "/" + userId;
 
+        log.info("Uploading {} statement for userId={}", type, userId);
         Map<String, Object> result = cloudinaryService.uploadFile(file, folder, publicId);
+        String uploadedPublicId = (String) result.get("public_id");
 
-        Statement statement = Statement.builder()
-                .userId(userId)
-                .statementType(type)
-                .cloudinaryPublicId((String) result.get("public_id"))
-                .statementUrl((String) result.get("secure_url"))
-                .originalFilename(file.getOriginalFilename())
-                .build();
-
-        financeRepository.save(statement);
-        log.info("Uploaded {} statement for userId={}", type, userId);
-        return FinancialStatementResponse.from(statement);
+        try {
+            Statement statement = Statement.builder()
+                    .userId(userId)
+                    .statementType(type)
+                    .cloudinaryPublicId(uploadedPublicId)
+                    .statementUrl((String) result.get("secure_url"))
+                    .originalFilename(file.getOriginalFilename())
+                    .build();
+            financeRepository.save(statement);
+            log.info("Uploaded {} statement for userId={}", type, userId);
+            return FinancialStatementResponse.from(statement);
+        } catch (RuntimeException e) {
+            try {
+                cloudinaryService.deleteFile(uploadedPublicId);
+            } catch (Exception suppress) {
+                log.warn("Failed to clean up orphaned Cloudinary file {}", uploadedPublicId, suppress);
+            }
+            throw e;
+        }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<FinancialStatementResponse> getAllByUser(String userId) {
         return financeRepository.findByUserId(userId)
@@ -81,14 +92,14 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
         cloudinaryService.deleteFile(statement.getCloudinaryPublicId());
         financeRepository.delete(statement);
     }
-    @Contract("null -> fail")
+
     private void validateStatement(MultipartFile file) {
         if (file == null || file.isEmpty())
             throw new InvalidFileException("File cannot be empty");
         if (file.getSize() > MAX_SIZE_BYTES)
             throw new InvalidFileException("File exceeds 10MB limit");
         if (!ALLOWED_TYPES.contains(file.getContentType()))
-            throw new InvalidFileException("Unsupported file type. Allowed: PDF, CSV, XLSX");
+            throw new InvalidFileException("Unsupported file type. Allowed: PDF, CSV, XLSX, XLS");
     }
 
     private static final Set<String> ALLOWED_TYPES = Set.of(

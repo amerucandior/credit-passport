@@ -60,13 +60,9 @@ public class ProfileServiceImpl implements ProfileService{
         userProfile.setUserId(userId);
         userProfile.setGender(request.gender());
         userProfile.setDateOfBirth(request.dateOfBirth());
-        userProfile.setEmployerName(
-                StringEscapeUtils.escapeHtml4(request.employerName()));
-        userProfile.setEmploymentStatus(request.employmentStatus());
-        userProfile.setOccupation(
-                StringEscapeUtils.escapeHtml4(request.occupation()));
-        userProfile.setSaccoName(
-                StringEscapeUtils.escapeHtml4(request.saccoName()));
+        userProfile.setEmployerName(request.employerName());
+        userProfile.setOccupation(request.occupation());
+        userProfile.setSaccoName(request.saccoName());
         userProfile.setMonthlyIncomeKes(request.monthlyIncomeKes());
         userProfile.setProfilePhotoUrl(
                 sanitizeUrl(request.profilePhotoUrl()));
@@ -93,12 +89,9 @@ public class ProfileServiceImpl implements ProfileService{
         // Only overwrite fields that were actually supplied
         if (request.gender()           != null) profile.setGender(request.gender());
         if (request.dateOfBirth()      != null) profile.setDateOfBirth(request.dateOfBirth());
-        if (request.employerName()    != null) profile.setEmployerName(
-                StringEscapeUtils.escapeHtml4(request.employerName()));
-        if (request.occupation()      != null) profile.setOccupation(
-                StringEscapeUtils.escapeHtml4(request.occupation()));
-        if (request.saccoName()       != null) profile.setSaccoName(
-                StringEscapeUtils.escapeHtml4(request.saccoName()));
+        if (request.employerName()    != null) profile.setEmployerName(request.employerName());
+        if (request.occupation()      != null) profile.setOccupation(request.occupation());
+        if (request.saccoName()       != null) profile.setSaccoName(request.saccoName());
         if (request.employmentStatus() != null) profile.setEmploymentStatus(request.employmentStatus());
         if (request.monthlyIncomeKes() != null) profile.setMonthlyIncomeKes(request.monthlyIncomeKes());
         if (request.profilePhotoUrl() != null) profile.setProfilePhotoUrl(

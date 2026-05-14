@@ -16,7 +16,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +28,7 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-    /**
-     * Pulls the authenticated user identifier without coupling this module to auth internals.
-     */
+
     @Operation(summary = "Create a profile")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Profile created successfully",
@@ -49,7 +46,7 @@ public class ProfileController {
                     content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class)))
     })
     @PostMapping
-    @SuppressWarnings("java:S5131") // XSS sanitized in ProfileService.createProfile() via StringEscapeUtils + OWASP policy
+    @SuppressWarnings("java:S5131") // XSS: Jackson serializes all string output as JSON-encoded — no raw HTML rendering
     public ResponseEntity<ProfileResponse> createProfile(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @Valid @RequestBody UpdateProfileRequest request) {
@@ -71,8 +68,9 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<ProfileResponse> getProfile(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
-        return ResponseEntity.ok(profileService.getProfile(principal.id());
+        return ResponseEntity.ok(profileService.getProfile(principal.id()));
     }
+
 
     @Operation(summary = "Update your profile")
     @ApiResponses({
