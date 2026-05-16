@@ -3,7 +3,7 @@ package com.passport.creditpassport.auth.serviceimplementation;
 import com.passport.creditpassport.auth.dto.LoginRequest;
 import com.passport.creditpassport.auth.dto.RegisterRequest;
 import com.passport.creditpassport.auth.models.User;
-import com.passport.creditpassport.auth.repository.UsersRepository;
+import com.passport.creditpassport.auth.UsersRepository;
 import com.passport.creditpassport.auth.service.AuthService;
 import com.passport.creditpassport.exception.*;
 import org.springframework.transaction.annotation.Transactional;

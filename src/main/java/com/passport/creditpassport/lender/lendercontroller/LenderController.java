@@ -1,8 +1,8 @@
 package com.passport.creditpassport.lender.lendercontroller;
 
 
-import com.passport.creditpassport.creditpassport.CreditPassport;
-import com.passport.creditpassport.creditpassport.CreditPassportQueryPort;
+import com.passport.creditpassport.creditpassport.CreditPassportService;
+import com.passport.creditpassport.creditpassport.model.CreditPassport;
 import com.passport.creditpassport.lender.lenderdto.CreditPassportRequest;
 import com.passport.creditpassport.lender.lenderdto.LenderRequest;
 import com.passport.creditpassport.lender.lenderdto.LenderResponse;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class LenderController {
 
     private final LenderService lenderService;
-    private final CreditPassportQueryPort creditPassportQueryPort;
+    private final CreditPassportService creditPassportService;
 
     @PostMapping("/register")
     public ResponseEntity<LenderResponse> register(@Valid @RequestBody LenderRequest request) {
@@ -34,10 +34,9 @@ public class LenderController {
     }
 
     @Operation(summary = "Fetch credit passport by national ID for authenticated lender")
-    @SecurityRequirement(name = "bearerAuth")
     @SecurityRequirement(name = "apiKeyAuth")
     @PostMapping("/credit-passport")
-    public ResponseEntity<CreditPassport> getCreditPassport(
+    public ResponseEntity<CreditPassport> getCreditPassport( // todo: make modular
         @Valid @RequestBody CreditPassportRequest req,
         HttpServletRequest httpRequest) {
 
@@ -51,12 +50,11 @@ public class LenderController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         // 3. Fetch and return the credit passport.
-        CreditPassport passport = creditPassportQueryPort.getCreditPassport(req.nationalId());
+        CreditPassport passport = creditPassportService.getCreditPassport(req.nationalId());
         return ResponseEntity.ok(passport);
     }
 
     @Operation(summary = "Lender API health endpoint")
-    @SecurityRequirement(name = "bearerAuth")
     @SecurityRequirement(name = "apiKeyAuth")
     @GetMapping("/health")
     public ResponseEntity<Void> health() {

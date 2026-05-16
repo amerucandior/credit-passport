@@ -1,6 +1,6 @@
 package com.passport.creditpassport.lender.lenderserviceimpl;
 
-import com.passport.creditpassport.lender.exceptions.LenderAlreadyExistsException;
+import com.passport.creditpassport.exception.LenderAlreadyExistsException;
 import com.passport.creditpassport.lender.lenderdto.LenderRequest;
 import com.passport.creditpassport.lender.lenderdto.LenderResponse;
 import com.passport.creditpassport.lender.lendermodel.Lender;

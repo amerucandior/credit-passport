@@ -35,7 +35,7 @@ public class Lender {
     @Column(name = "certificate_of_incorporation")
     private String certificateOfIncorporation;
 
-    @Column(name = "memorandum_articles_of_association")
+    @Column(name = "memorandum_articles_of_association", nullable = true)
     private String memorandumArticlesOfAssociation;
 
     @Column(name = "reg_business_address")
@@ -56,4 +56,5 @@ public class Lender {
 
     @Column(nullable = false)
     private boolean enabled = false;    // becomes true after lender meets requirements
+    // used in future to soft block lenders from accessing credit-passports
 }
