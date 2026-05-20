@@ -1,24 +1,22 @@
-package com.passport.creditpassport.statement.models;
-
-import com.passport.creditpassport.auth.models.User;
-import com.passport.creditpassport.statement.enums.StatementType;
-import jakarta.persistence.*;
-import lombok.*;
+package com.passport.creditpassport.kyc.model;
 
 import com.github.f4b6a3.uuid.UuidCreator;
+import com.passport.creditpassport.auth.models.User;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-@Setter
 @Getter
+@Setter
 @Entity
-@Table( name = "statements")
+@Table(name = "kyc")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Statement {
+public class KYC {
 
     @Id
     @Column(name = "id", updatable = false, nullable = false)
@@ -38,28 +36,23 @@ public class Statement {
     )
     private User user;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "statement_type", nullable = false)
-    private StatementType statementType;
+    @Column(name = "selfie_picture", nullable = false)
+    private String selfiePicture;
 
-    @Column(name = "institution_hint")
-    private String institutionHint;
+    @Column(name = "national_id_front", nullable = false)
+    private String nationalIdFront;
 
-    // extracted from the uploaded file on upload
-    @Column(name = "original_filename")
-    private String originalFilename;
+    @Column(name = "national_id_back", nullable = false)
+    private String nationalIdBack;
+
+    @Column(name = "kra_pin", nullable = false)
+    private String kraPin;
+
+    @Column(name = "latest_payslip", nullable = false)
+    private String latestPayslip;
 
     @Column(name = "cloudinary_public_id")
     private String cloudinaryPublicId;
-
-    @Column(name = "statement_url")
-    private String statementUrl;
-
-    @Column(name = "account_alias")
-    private String accountAlias;
-
-    @Column(name = "statement_password")
-    private String statementPassword;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -67,5 +60,7 @@ public class Statement {
 
     @Column(nullable = false)
     @Builder.Default
-    private boolean parsed = false; // becomes true after parsing is completed
+    private boolean verified = false; // becomes true after admin verification
 }
+
+
