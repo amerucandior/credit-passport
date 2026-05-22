@@ -105,6 +105,7 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
             "application/pdf",
             "text/csv",
             "application/vnd.ms-excel",
+            "application/octet-stream",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
 }

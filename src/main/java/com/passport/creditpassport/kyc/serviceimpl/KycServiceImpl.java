@@ -4,6 +4,7 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import com.passport.creditpassport.exception.InvalidFileException;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
 import com.passport.creditpassport.kyc.dto.KycResponse;
+import com.passport.creditpassport.kyc.enums.KycDocType;
 import com.passport.creditpassport.kyc.model.KYC;
 import com.passport.creditpassport.kyc.repository.KycRepository;
 import com.passport.creditpassport.kyc.service.KycService;
@@ -29,7 +30,8 @@ public class KycServiceImpl implements KycService {
     private static final long MAX_SIZE_BYTES   = 5 * 1024 * 1024L;
 
     @Override
-    public KycResponse uploadKycDoc(String userId, MultipartFile file) {
+    @Transactional
+    public KycResponse uploadKycDoc(String userId, MultipartFile file, KycDocType kycDocType) {
         validateKycDocument(file);
 
         String publicId = "kyc_" + userId + "_doc_" + UuidCreator.getTimeOrderedEpoch();
@@ -40,17 +42,24 @@ public class KycServiceImpl implements KycService {
         String uploadedPublicId = (String) result.get("public_id");
 
         try {
-            KYC kyc = KYC.builder()
-                    .userId(userId)
-                    .cloudinaryPublicId(uploadedPublicId)
-                    .kraPin((String) result.get("kra_pin"))
-                    .selfiePicture((String) result.get("selfie_picture"))
-                    .latestPayslip((String) result.get("latest_payslip"))
-                    .nationalIdFront((String) result.get("national_id_front"))
-                    .nationalIdBack((String) result.get("national_id_back"))
-                    .build();
+            KYC kyc = kycRepository.findByUserId(userId)
+                    .orElse(KYC.builder().userId(userId).build());
+
+            switch (kycDocType) {
+                case SELFIE            -> kyc.setSelfiePicture(
+                        cloudinaryService.generateSecureUrl(uploadedPublicId));
+                case NATIONAL_ID_FRONT -> kyc.setNationalIdFront(
+                        cloudinaryService.generateSecureUrl(uploadedPublicId));
+                case NATIONAL_ID_BACK  -> kyc.setNationalIdBack(
+                        cloudinaryService.generateSecureUrl(uploadedPublicId));
+                case KRA_PIN           -> kyc.setKraPin(
+                        cloudinaryService.generateSecureUrl(uploadedPublicId));
+                case PAYSLIP           -> kyc.setLatestPayslip(
+                        cloudinaryService.generateSecureUrl(uploadedPublicId));
+            }
+            kyc.setCloudinaryPublicId(uploadedPublicId);
             kycRepository.save(kyc);
-            log.info("Uploaded document to folder {} for userID = {}", folder, userId);
+            log.info("Uploaded KYC {} for userID = {}", kycDocType, userId);
             return KycResponse.from(kyc);
         } catch (RuntimeException e) {
             try {
@@ -74,10 +83,9 @@ public class KycServiceImpl implements KycService {
     @Override
     @Transactional(readOnly = true)
     public KycResponse getKycDoc(String userId) {
-//        return KycRepository.findByUserId(userId) Optional<KYC>
-//                .map(KycResponse::from) Optional<KycResponse>
-//        .orElseThrow() -> new ResourceNotFoundException("KYC not found")
-        return null;
+        return kycRepository.findByUserId(userId)
+                .map(KycResponse::from)
+                .orElseThrow(() -> new ResourceNotFoundException("KYC not found for user: " + userId));
     }
 
     private void validateKycDocument(MultipartFile file) {

@@ -2,6 +2,7 @@ package com.passport.creditpassport.kyc.model;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.passport.creditpassport.auth.models.User;
+import com.passport.creditpassport.kyc.enums.KycDocType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,7 +24,7 @@ public class KYC {
     @Builder.Default
     private UUID id = UuidCreator.getTimeOrderedEpoch();
 
-    @Column(name = "user_id", nullable = false, updatable = false)
+    @Column(name = "user_id", nullable = false, updatable = false, unique = true)
     private String userId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -36,19 +37,23 @@ public class KYC {
     )
     private User user;
 
-    @Column(name = "selfie_picture", nullable = false)
+    @Column(name = "kyc_doc_type")
+    @Enumerated(EnumType.STRING)
+    private KycDocType kycDocType;
+
+    @Column(name = "selfie_picture")
     private String selfiePicture;
 
-    @Column(name = "national_id_front", nullable = false)
+    @Column(name = "national_id_front")
     private String nationalIdFront;
 
-    @Column(name = "national_id_back", nullable = false)
+    @Column(name = "national_id_back")
     private String nationalIdBack;
 
-    @Column(name = "kra_pin", nullable = false)
+    @Column(name = "kra_pin")
     private String kraPin;
 
-    @Column(name = "latest_payslip", nullable = false)
+    @Column(name = "latest_payslip")
     private String latestPayslip;
 
     @Column(name = "cloudinary_public_id")

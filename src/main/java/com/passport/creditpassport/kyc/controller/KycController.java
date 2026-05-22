@@ -3,6 +3,7 @@ package com.passport.creditpassport.kyc.controller;
 import com.passport.creditpassport.auth.AuthenticatedUserPrincipal;
 import com.passport.creditpassport.kyc.dto.KycRequest;
 import com.passport.creditpassport.kyc.dto.KycResponse;
+import com.passport.creditpassport.kyc.enums.KycDocType;
 import com.passport.creditpassport.kyc.service.KycService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,10 +29,23 @@ public class KycController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<KycResponse> kycDoc (
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
-            @RequestPart("file") MultipartFile file
-    ) {
-        KycResponse kycResponse = kycService.uploadKycDoc(principal.id(), file);
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "kycDocType")KycDocType kycDocType
+            ) {
+        KycResponse kycResponse = kycService.uploadKycDoc(principal.id(), file, kycDocType);
         return ResponseEntity.ok(kycResponse);
     }
 
+    @Operation(summary = "Get a KYC document by ID")
+    @GetMapping
+    public ResponseEntity<KycResponse> getKyc(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
+        return ResponseEntity.ok(kycService.getKycDoc(principal.id()));
+    }
+
+    @Operation(summary = "Delete a KYC document by ID")
+    @DeleteMapping
+    public ResponseEntity<Void> deleteKyc(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
+        kycService.deleteKycDoc(principal.id());
+        return ResponseEntity.noContent().build();
+    }
 }

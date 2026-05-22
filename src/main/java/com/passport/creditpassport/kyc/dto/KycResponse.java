@@ -8,16 +8,15 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record KycResponse(
-
-        String createdAt,
+        String userId,
         boolean verified,
-        Instant userId
+        Instant createdAt
 ) {
-    public static KycResponse from(KYC response) {
+    public static KycResponse from(KYC kyc) {
         return new KycResponse(
-                response.getUserId(),
-                response.isVerified(),
-                response.getCreatedAt()
+                kyc.getUserId(),
+                kyc.isVerified(),
+                kyc.getCreatedAt()
         );
     }
 }

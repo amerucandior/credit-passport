@@ -1,14 +1,19 @@
 package com.passport.creditpassport.creditpassport.model;
-//Credit-passport model
+
+import com.github.f4b6a3.uuid.UuidCreator;
+import com.passport.creditpassport.auth.models.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.UUID;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -16,9 +21,22 @@ import java.time.LocalDate;
 public class CreditPassport {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "passport_id")
-    private String passportId;
+    @Builder.Default
+    private UUID passportId = UuidCreator.getTimeOrderedEpoch();
+
+    @Column(name = "user_id", nullable = false, updatable = false)
+    private String userId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "user_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(name = "fk_creditpassport_user")
+    )
+    private User user;
 
     // Link back to the user by nationalId — no FK join needed across services
     @Column(name = "national_id", unique = true, nullable = false)
@@ -43,19 +61,6 @@ public class CreditPassport {
 
     @Column(name = "credit_score_band")
     private String creditScoreBand;        // "GOOD", "FAIR", "POOR"
-
-    // Repayment behaviour // I also think these should be user supplied?
-    @Column(name = "total_loans_taken")
-    private Integer totalLoansTaken;
-
-    @Column(name = "loans_repaid_on_time")
-    private Integer loansRepaidOnTime;
-
-    @Column(name = "loans_defaulted")
-    private Integer loansDefaulted;
-
-    @Column(name = "repayment_rate")
-    private Double repaymentRate;          // 0.95 = 95%
 
     // Passport validity
     @Column(name = "issued_at", nullable = false)

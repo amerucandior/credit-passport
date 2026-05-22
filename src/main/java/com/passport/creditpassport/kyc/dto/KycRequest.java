@@ -1,8 +1,12 @@
 package com.passport.creditpassport.kyc.dto;
 
+import com.passport.creditpassport.kyc.enums.KycDocType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record KycRequest(
+
+        @Schema(description = "document type")
+        KycDocType kycDocType,
 
         @Schema(description = "a selfie picture")
         String selfiePicture,
