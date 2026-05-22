@@ -25,21 +25,6 @@ public class ProfileServiceImpl implements ProfileService{
 
     private final ProfileRepository profileRepository;
 
-    private static String sanitizeUrl(String url) {
-        if (url == null) return null;
-        try {
-            URI uri = new URI(url);
-            String scheme = uri.getScheme();
-            if (!"https".equalsIgnoreCase(scheme) && !"http".equalsIgnoreCase(scheme)) {
-                throw new InvalidProfilePhotoUrlException();
-            }
-            return uri.toString();
-        } catch (URISyntaxException e) {
-            throw new InvalidProfilePhotoUrlException();
-        }
-    }
-
-
     @Override
     @Transactional
     public ProfileResponse createProfile(String userId, UpdateProfileRequest request) {
@@ -64,8 +49,7 @@ public class ProfileServiceImpl implements ProfileService{
         userProfile.setOccupation(request.occupation());
         userProfile.setSaccoName(request.saccoName());
         userProfile.setMonthlyIncomeKes(request.monthlyIncomeKes());
-        userProfile.setProfilePhotoUrl(
-                sanitizeUrl(request.profilePhotoUrl()));
+        userProfile.setProfilePhotoUrl(request.profilePhotoUrl());
         return userProfile;
     }
 
@@ -94,8 +78,7 @@ public class ProfileServiceImpl implements ProfileService{
         if (request.saccoName()       != null) profile.setSaccoName(request.saccoName());
         if (request.employmentStatus() != null) profile.setEmploymentStatus(request.employmentStatus());
         if (request.monthlyIncomeKes() != null) profile.setMonthlyIncomeKes(request.monthlyIncomeKes());
-        if (request.profilePhotoUrl() != null) profile.setProfilePhotoUrl(
-                sanitizeUrl(request.profilePhotoUrl()));
+        if (request.profilePhotoUrl() != null) profile.setProfilePhotoUrl(request.profilePhotoUrl());
         UserProfile saved = profileRepository.save(profile);
         log.info("Profile updated for userId {}", userId);
         return ProfileResponse.fromEntity(saved);

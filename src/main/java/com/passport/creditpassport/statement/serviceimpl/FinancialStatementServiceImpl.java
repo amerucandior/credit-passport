@@ -11,7 +11,6 @@ import com.passport.creditpassport.statement.repository.FinanceRepository;
 import com.passport.creditpassport.statement.service.FinancialStatementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,6 +105,7 @@ public class FinancialStatementServiceImpl implements FinancialStatementService 
             "application/pdf",
             "text/csv",
             "application/vnd.ms-excel",
+            "application/octet-stream",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
 }

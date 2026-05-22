@@ -47,7 +47,7 @@ public class LenderServiceImpl implements LenderService {
 
         if (request.memorandumArticlesOfAssociation()  != null &&
                 lenderRepository.existsByMemorandumArticlesOfAssociation(request.memorandumArticlesOfAssociation())) {
-        return RegistrationFailure.MEMORANDUM_OF_ASSOCIATION_ALREADY_EXISTS;
+            return RegistrationFailure.MEMORANDUM_OF_ASSOCIATION_ALREADY_EXISTS;
         }
 
 

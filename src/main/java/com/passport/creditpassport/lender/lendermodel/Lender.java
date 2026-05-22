@@ -26,7 +26,7 @@ public class Lender {
     @Column(name = "lender_id")
     private String lenderId;
 
-    @Column(name = "lender_name") // todo: guard against xss
+    @Column(name = "lender_name")
     private String lenderName;
 
     @Column(name = "cbk_license_no")

@@ -22,6 +22,7 @@ public class Statement {
 
     @Id
     @Column(name = "id", updatable = false, nullable = false)
+    @Builder.Default
     private UUID id = UuidCreator.getTimeOrderedEpoch();
 
     @Column(name = "user_id", nullable = false, updatable = false)
@@ -65,5 +66,6 @@ public class Statement {
     private Instant createdAt;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean parsed = false; // becomes true after parsing is completed
 }
