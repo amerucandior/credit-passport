@@ -50,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 3. Validate and extract the subject (UUID stored when the token was issued).
         //    Any exception means the token is unusable — log quietly and skip.
         final String userId;
+        final String natId;
 
         try {
             if (!jwtService.validateToken(token)) {
@@ -58,6 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
             userId = jwtService.extractSubject(token);
+            natId  = jwtService.extractNatId(token);
         } catch (Exception e) {
             log.debug("Could not process JWT: {}", e.getMessage());
             filterChain.doFilter(request, response);
@@ -84,7 +86,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //    credentials = null — password not needed after JWT validation.
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(
-                        new AuthenticatedUserPrincipal(userId),
+                        new AuthenticatedUserPrincipal(userId, natId),
                         null,
                         Collections.emptyList()
                 );

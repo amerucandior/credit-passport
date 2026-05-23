@@ -33,12 +33,13 @@ public class JwtService {
      *               UUIDs are stable; names and national IDs can change.
      *               The filter uses this value to call usersRepository.findById().
      */
-    public String generateToken(String userId) {
+    public String generateToken(String userId, String natId) {
         Date now    = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
         return Jwts.builder()
                 .subject(userId)
+                .claim("natId", natId)
                 .issuer(JWT_ISSUER)
                 .issuedAt(now)
                 .expiration(expiry)
@@ -78,5 +79,9 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public String extractNatId(String token) {
+        return extractClaims(token).get("natId", String.class);
     }
 }
