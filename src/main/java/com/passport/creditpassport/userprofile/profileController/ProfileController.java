@@ -50,7 +50,13 @@ public class ProfileController {
     public ResponseEntity<ProfileResponse> createProfile(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @Valid @RequestBody UpdateProfileRequest request) {
-        ProfileResponse response = profileService.createProfile(principal.id(), request);
+        ProfileResponse response = profileService.createProfile(
+                principal.id(),
+                principal.name(),
+                principal.email(),
+                principal.number(),
+                principal.natId(),
+                request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -68,7 +74,13 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<ProfileResponse> getProfile(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
-        return ResponseEntity.ok(profileService.getProfile(principal.id()));
+        return ResponseEntity.ok(profileService.getProfile(
+                principal.id(),
+                principal.name(),
+                principal.email(),
+                principal.number(),
+                principal.natId()
+        ));
     }
 
 
@@ -92,6 +104,12 @@ public class ProfileController {
     public ResponseEntity<ProfileResponse> updateProfile(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
             @Valid @RequestBody UpdateProfileRequest request) {
-        return ResponseEntity.ok(profileService.updateProfile(principal.id(), request));
+        return ResponseEntity.ok(profileService.updateProfile(
+                principal.id(),
+                principal.name(),
+                principal.email(),
+                principal.number(),
+                principal.natId(),
+                request));
     }
 }
