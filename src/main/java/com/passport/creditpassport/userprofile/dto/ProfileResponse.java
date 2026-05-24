@@ -1,5 +1,6 @@
 package com.passport.creditpassport.userprofile.dto;
 
+import com.passport.creditpassport.auth.AuthenticatedUserPrincipal;
 import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.userprofile.models.EmploymentStatus;
 import com.passport.creditpassport.userprofile.models.Gender;
@@ -15,6 +16,7 @@ public record ProfileResponse(
         String profileId,
         String userId,
         String name,
+        String email,
         String number,
         String natId,
         LocalDate dateOfBirth,
@@ -28,13 +30,14 @@ public record ProfileResponse(
         Instant createdAt,
         Instant updatedAt) {
 
-    public static ProfileResponse fromEntity(UserProfile profile) {
-        User user = profile.getUser();
-        return new ProfileResponse(profile.getProfileId(),
+    public static ProfileResponse fromEntity(UserProfile profile, String name, String email, String number, String natId) {
+        return new ProfileResponse(
+                profile.getProfileId(),
                 profile.getUserId(),
-                user.getName(),
-                user.getNumber(),
-                user.getNatId(),
+                name,
+                number,
+                email,
+                natId,
                 profile.getDateOfBirth(),
                 profile.getGender(),
                 profile.getEmploymentStatus(),

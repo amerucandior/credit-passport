@@ -118,9 +118,15 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class)))
     })
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request) {
-        loginOtpImpl.initiateLogin(request.identifier(), request.userPassword());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = loginOtpImpl.initiateLogin(
+                request.identifier(), request.userPassword()
+        );
+
+        // null signals OTP was sent, no token yet
+        return response == null
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.ok(response);
     }
 
     /**

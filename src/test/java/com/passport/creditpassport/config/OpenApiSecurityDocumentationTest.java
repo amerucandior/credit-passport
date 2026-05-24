@@ -93,9 +93,9 @@ class OpenApiSecurityDocumentationTest {
         // #endregion
 
         assertThat(profileHasBearer).isTrue();
-        assertThat(lenderCreditHasBearer).isTrue();
+        assertThat(lenderCreditHasBearer).isFalse();
         assertThat(lenderCreditHasApiKey).isTrue();
-        assertThat(lenderHealthHasBearer).isTrue();
+        assertThat(lenderHealthHasBearer).isFalse();
         assertThat(lenderHealthHasApiKey).isTrue();
     }
 

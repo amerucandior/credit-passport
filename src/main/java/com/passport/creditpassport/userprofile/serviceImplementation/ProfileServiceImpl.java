@@ -27,7 +27,7 @@ public class ProfileServiceImpl implements ProfileService{
 
     @Override
     @Transactional
-    public ProfileResponse createProfile(String userId, UpdateProfileRequest request) {
+    public ProfileResponse createProfile(String userId, String name,String email, String number, String natId, UpdateProfileRequest request) {
 
         if (profileRepository.existsByUserId(userId)) {
             throw new ProfileAlreadyExistsException(userId);
@@ -37,7 +37,7 @@ public class ProfileServiceImpl implements ProfileService{
 
         UserProfile saved = profileRepository.save(userProfile);
         log.info("Profile created for userId {}", userId);
-        return ProfileResponse.fromEntity(saved);
+        return ProfileResponse.fromEntity(saved, name, email, number, natId);
     }
 
     private static @NonNull UserProfile getUserProfile(UpdateProfileRequest request, String userId) {
@@ -56,16 +56,16 @@ public class ProfileServiceImpl implements ProfileService{
     //    Read user profile
     @Transactional(readOnly = true)
     @Override
-    public ProfileResponse getProfile(String userId) {
+    public ProfileResponse getProfile(String userId, String name, String email, String number, String natId) {
         UserProfile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
 
-        return ProfileResponse.fromEntity(profile);
+        return ProfileResponse.fromEntity(profile, name, email, number, natId);
     }
 
     @Override
     @Transactional
-    public ProfileResponse updateProfile(String userId, UpdateProfileRequest request) {
+    public ProfileResponse updateProfile(String userId, String name, String email, String number, String natId, UpdateProfileRequest request) {
         UserProfile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Profile not found — create one first."));
@@ -81,6 +81,6 @@ public class ProfileServiceImpl implements ProfileService{
         if (request.profilePhotoUrl() != null) profile.setProfilePhotoUrl(request.profilePhotoUrl());
         UserProfile saved = profileRepository.save(profile);
         log.info("Profile updated for userId {}", userId);
-        return ProfileResponse.fromEntity(saved);
+        return ProfileResponse.fromEntity(saved, name, email, number, natId);
     }
 }

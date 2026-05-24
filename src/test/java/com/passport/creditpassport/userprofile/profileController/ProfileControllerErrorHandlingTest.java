@@ -1,6 +1,7 @@
-package com.passport.creditpassport.UserProfile.profileController;
+package com.passport.creditpassport.userprofile.profileController;
 
-import com.passport.creditpassport.UserProfile.service.ProfileService;
+import com.passport.creditpassport.auth.WithMockAppUser;
+import com.passport.creditpassport.userprofile.service.ProfileService;
 import com.passport.creditpassport.config.JwtAuthenticationFilter;
 import com.passport.creditpassport.config.SecurityConfig;
 import com.passport.creditpassport.exception.GlobalExceptionHandler;
@@ -16,7 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -60,7 +60,7 @@ class ProfileControllerErrorHandlingTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockAppUser
     void createProfile_returnsBadRequest_whenProfilePhotoUrlIsInvalid() throws Exception {
         String requestBody = """
                 {
@@ -68,7 +68,7 @@ class ProfileControllerErrorHandlingTest {
                 }
                 """;
 
-        given(profileService.createProfile(any(), any()))
+        given(profileService.createProfile(any(), any(), any(), any(), any(), any()))
                 .willThrow(new InvalidProfilePhotoUrlException());
 
         mockMvc.perform(post("/api/profile")
@@ -81,11 +81,11 @@ class ProfileControllerErrorHandlingTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockAppUser
     void createProfile_returnsConflict_whenProfileAlreadyExists() throws Exception {
         String requestBody = "{}";
 
-        given(profileService.createProfile(any(), any()))
+        given(profileService.createProfile(any(), any(), any(), any(), any(), any()))
                 .willThrow(new ProfileAlreadyExistsException("user-123"));
 
         mockMvc.perform(post("/api/profile")

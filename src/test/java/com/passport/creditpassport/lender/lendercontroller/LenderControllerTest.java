@@ -1,7 +1,7 @@
 package com.passport.creditpassport.lender.lendercontroller;
 
+import com.passport.creditpassport.creditpassport.CreditPassportService;
 import com.passport.creditpassport.creditpassport.model.CreditPassport;
-import com.passport.creditpassport.creditpassport.CreditPassportQueryPort;
 import com.passport.creditpassport.lender.lenderdto.LenderResponse;
 import com.passport.creditpassport.lender.lendermodel.Lender;
 import com.passport.creditpassport.lender.lenderservice.LenderService;
@@ -46,7 +46,7 @@ class LenderControllerTest {
     private LenderService lenderService;
 
     @Autowired
-    private CreditPassportQueryPort creditPassportQueryPort;
+    private CreditPassportService creditPassportService;
 
     @TestConfiguration
     static class MockConfig {
@@ -56,8 +56,8 @@ class LenderControllerTest {
         }
 
         @Bean
-        CreditPassportQueryPort creditPassportQueryPort() {
-            return org.mockito.Mockito.mock(CreditPassportQueryPort.class);
+        CreditPassportService creditPassportService() {
+            return org.mockito.Mockito.mock(CreditPassportService.class);
         }
     }
 
@@ -123,7 +123,7 @@ class LenderControllerTest {
         passport.setName("Jane Borrower");
         passport.setCreditScore(740);
 
-        given(creditPassportQueryPort.getCreditPassport(eq("12345678"))).willReturn(passport);
+        given(creditPassportService.getCreditPassport(eq("12345678"))).willReturn(passport);
 
         String payload = """
                 {

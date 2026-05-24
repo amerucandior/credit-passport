@@ -34,7 +34,7 @@ public class LoginOtpImpl {
      * then generates and emails a login OTP. No JWT is issued here.
      */
     @Transactional
-    public void initiateLogin(String identifier, String password) {
+    public AuthResponse initiateLogin(String identifier, String password) {
         Authentication authentication = authServiceImpl.authenticate(
                 new UsernamePasswordAuthenticationToken(identifier, password)
         );
@@ -45,14 +45,21 @@ public class LoginOtpImpl {
             throw new IllegalStateException("Account not verified. Complete email verification first.");
         }
 
-        String otpCode = OtpUtils.generateOtpCode();
-        String otpHash = OtpUtils.hashOtp(otpCode);
+        if (isEmail(identifier)) {
+            String otpCode = OtpUtils.generateOtpCode();
+            String otpHash = OtpUtils.hashOtp(otpCode);
 
-        user.setLoginOtp(otpHash);
-        user.setLoginOtpExpiresAt(OtpUtils.expiryInstant(OTP_TTL));
-        usersRepository.save(user);
+            user.setLoginOtp(otpHash);
+            user.setLoginOtpExpiresAt(OtpUtils.expiryInstant(OTP_TTL));
+            usersRepository.save(user);
 
-        emailService.sendOtpEmail(user.getEmail(), "Your login code", otpCode);
+            emailService.sendOtpEmail(user.getEmail(), "Your login code", otpCode);
+        }
+
+        String token = jwtService.generateToken(user.getId(), user.getNatId(), user.getName(), user.getEmail(), user.getNumber());
+        log.info("Login successful for user {} email {}", user.getName(), user.getEmail());
+
+        return AuthResponse.builder().token(token).build();
     }
 
     /**
@@ -79,9 +86,13 @@ public class LoginOtpImpl {
         user.setLoginOtpExpiresAt(null);
         usersRepository.save(user);
 
-        String token = jwtService.generateToken(user.getId(), user.getNatId());
+        String token = jwtService.generateToken(user.getId(), user.getNatId(), user.getName(), user.getEmail(), user.getNumber());
         log.info("Login successful for user {} email {}", user.getName(), user.getEmail());
 
         return AuthResponse.builder().token(token).build();
+    }
+
+    private boolean isEmail(String identifier) {
+        return identifier.contains("@");
     }
 }
