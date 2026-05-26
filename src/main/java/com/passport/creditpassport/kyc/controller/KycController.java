@@ -46,7 +46,7 @@ public class KycController {
     }
 
     @Operation(summary = "Delete a KYC document by ID")
-    @PreAuthorize("hasRole('BORROWER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping
     public ResponseEntity<Void> deleteKyc(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
         kycService.deleteKycDoc(principal.id());

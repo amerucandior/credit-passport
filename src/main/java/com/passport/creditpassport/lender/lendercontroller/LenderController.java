@@ -38,7 +38,7 @@ public class LenderController {
     @SecurityRequirement(name = "apiKeyAuth")
     @PreAuthorize("hasRole('LENDER')")
     @PostMapping("/credit-passport")
-    public ResponseEntity<CreditPassport> getCreditPassport( // todo: make modular
+    public ResponseEntity<CreditPassport> getCreditPassport(
         @Valid @RequestBody CreditPassportRequest req,
         HttpServletRequest httpRequest) {
 
