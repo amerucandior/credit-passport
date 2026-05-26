@@ -34,8 +34,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // 1. Read the Authorization header.
-        //    If absent or not a Bearer token — public endpoint or missing credentials.
+        // 1. Read the Authorisation header.
+        //    If absent or not, a Bearer token — public endpoint or missing credentials.
         //    Step aside; ExceptionTranslationFilter produces the 401.
         final String authHeader = request.getHeader("Authorization");
 

@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
     }
 
     /**
-     * Validates email + password only. No JWT is issued here.
+     * Validates email and password only. No JWT is issued here.
      * Delegates to authenticate() so the logic lives in one place.
      */
     @Override
@@ -87,7 +87,10 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
         String identifier = (String) authentication.getPrincipal();
         String password = (String) authentication.getCredentials();
 
-        User found = usersRepository.findByEmailOrNatId(identifier, identifier)
+        User found = identifier.contains("@")
+                ? usersRepository.findByEmail(identifier)
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"))
+                : usersRepository.findByNatId(identifier)
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(password, found.getPassword())) {

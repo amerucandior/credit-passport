@@ -1,10 +1,12 @@
 package com.passport.creditpassport.auth.service;
 
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HexFormat;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import static java.util.regex.Pattern.matches;
 
 /**
  * Stateless utility for OTP generation, hashing, and expiry.
@@ -13,8 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public final class OtpUtils {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private static final BCryptPasswordEncoder ENCODER = new BCryptPasswordEncoder();
-
 
     /** Returns a cryptographically random 6-digit code, zero-padded. */
     public static String generateOtpCode() {
@@ -22,14 +22,21 @@ public final class OtpUtils {
         return String.format("%06d", code);
     }
 
-    /** BCrypt-hashes the raw OTP for safe storage. */
+    /** SHA256-hashes the raw OTP for safe storage. */
     public static String hashOtp(String rawOtp) {
-        return ENCODER.encode(rawOtp);
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(rawOtp.getBytes());
+            return HexFormat.of().formatHex(hashBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to hash otp code", e);
+        }
     }
 
-    /** Returns true when the raw OTP matches the stored BCrypt hash. */
+    /** Returns true when the raw OTP matches the stored SHA256 hash. */
     public static boolean verifyOtp(String rawOtp, String storedHash) {
-        return ENCODER.matches(rawOtp, storedHash);
+        String hash = hashOtp(rawOtp);
+        return matches(hash, storedHash);
     }
 
     /** Returns the Instant at which an OTP generated now will expire. */
