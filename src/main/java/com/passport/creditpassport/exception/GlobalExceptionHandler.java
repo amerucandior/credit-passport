@@ -27,6 +27,66 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidOtp(InvalidOtpException ex,
+                                                             HttpServletRequest request) {
+        return buildError(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(OtpExpiredException.class)
+    public ResponseEntity<ApiErrorResponse> handleOtpExpired(OtpExpiredException ex,
+                                                             HttpServletRequest request) {
+        return buildError(HttpStatus.GONE, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(AccountNotVerifiedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccountNotVerified(AccountNotVerifiedException ex,
+                                                                     HttpServletRequest request) {
+        return buildError(HttpStatus.FORBIDDEN, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(AccountAlreadyVerifiedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccountAlreadyVerified(AccountAlreadyVerifiedException ex,
+                                                                         HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
+    // File / input errors
+    @ExceptionHandler(InvalidFileException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidFile(InvalidFileException ex,
+                                                              HttpServletRequest request) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    // Upstream dependency failures — these get logged; client gets a generic message
+    @ExceptionHandler(CloudinaryUploadException.class)
+    public ResponseEntity<ApiErrorResponse> handleCloudinaryUpload(CloudinaryUploadException ex,
+                                                                   HttpServletRequest request) {
+        log.error("Cloudinary upload failed at [{}]", request.getRequestURI(), ex);
+        return buildError(HttpStatus.BAD_GATEWAY, "File upload service unavailable. Try again later.", request);
+    }
+
+    @ExceptionHandler(ScoringServiceException.class)
+    public ResponseEntity<ApiErrorResponse> handleScoringService(ScoringServiceException ex,
+                                                                 HttpServletRequest request) {
+        log.error("Scoring service failure at [{}]", request.getRequestURI(), ex);
+        return buildError(HttpStatus.BAD_GATEWAY, "Scoring service unavailable. Try again later.", request);
+    }
+
+    @ExceptionHandler(OtpMaxAttemptsExceededException.class)
+    public ResponseEntity<ApiErrorResponse> handleOtpMaxAttempts(OtpMaxAttemptsExceededException ex,
+                                                                 HttpServletRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Retry-After", "0");
+
+        ApiErrorResponse body = buildError(
+                HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request).getBody();
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .headers(headers)
+                .body(body);
+    }
+
     @ExceptionHandler(InvalidProfilePhotoUrlException.class)
     public ResponseEntity<ApiErrorResponse> handleInvalidPhotoUrl(InvalidProfilePhotoUrlException ex,
                                                                    HttpServletRequest request) {

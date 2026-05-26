@@ -61,6 +61,10 @@ public class User {
     @Column(name = "login_otp_expires_at")
     private Instant loginOtpExpiresAt;
 
+    // OTP attempts
+    @Column(nullable = false)
+    private int loginOtpAttempts = 0;
+
     // Auditing
     @CreationTimestamp
     @Column(updatable = false)

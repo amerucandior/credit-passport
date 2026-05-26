@@ -51,6 +51,7 @@ public class LoginOtpImpl {
 
         user.setLoginOtp(otpHash);
         user.setLoginOtpExpiresAt(OtpUtils.expiryInstant(OTP_TTL));
+        user.setLoginOtpAttempts(0);
         usersRepository.save(user);
 
         return new OtpPayload(user.getEmail(), otpCode);
@@ -72,6 +73,19 @@ public class LoginOtpImpl {
             throw new OtpExpiredException("Login OTP has expired.");
         }
         if (!OtpUtils.verifyOtp(otpCode, user.getLoginOtp())) {
+            int attempts = user.getLoginOtpAttempts() + 1;
+            user.setLoginOtpAttempts(attempts);
+
+            if (attempts >= OtpUtils.MAX_ATTEMPTS) {
+                user.setLoginOtp(null);
+                user.setLoginOtpExpiresAt(null);
+                user.setLoginOtpAttempts(0);
+                usersRepository.save(user);
+                throw new OtpMaxAttemptsExceededException(
+                        "Too many incorrect attempts. Request a new login OTP.");
+            }
+
+            usersRepository.save(user);
             throw new InvalidOtpException("Invalid login OTP.");
         }
 

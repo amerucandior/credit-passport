@@ -15,6 +15,7 @@ import static java.util.regex.Pattern.matches;
 public final class OtpUtils {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    public static final int MAX_ATTEMPTS = 10;
 
     /** Returns a cryptographically random 6-digit code, zero-padded. */
     public static String generateOtpCode() {
