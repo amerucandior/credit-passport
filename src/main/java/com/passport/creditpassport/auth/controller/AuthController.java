@@ -1,9 +1,6 @@
 package com.passport.creditpassport.auth.controller;
 
-import com.passport.creditpassport.auth.dto.AuthResponse;
-import com.passport.creditpassport.auth.dto.LoginRequest;
-import com.passport.creditpassport.auth.dto.OtpRequest;
-import com.passport.creditpassport.auth.dto.RegisterRequest;
+import com.passport.creditpassport.auth.dto.*;
 import com.passport.creditpassport.auth.service.AuthService;
 import com.passport.creditpassport.auth.serviceimplementation.LoginOtpImpl;
 import com.passport.creditpassport.auth.serviceimplementation.RegistrationOtpImpl;
@@ -119,7 +116,8 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest request) {
-        loginOtpImpl.initiateLogin(request.identifier(), request.userPassword());
+        OtpPayload payload = loginOtpImpl.initiateLogin(request.identifier(), request.userPassword());
+        authService.sendLoginEmailVerificationOtp(payload.email(), payload.otpCode());
         return ResponseEntity.ok().build();
     }
 

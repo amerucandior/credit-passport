@@ -4,8 +4,6 @@ import com.passport.creditpassport.kyc.dto.KycResponse;
 import com.passport.creditpassport.kyc.enums.KycDocType;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
-
 public interface KycService {
     KycResponse uploadKycDoc(String userId, MultipartFile file, KycDocType kycDocType);
     void deleteKycDoc(String userId);

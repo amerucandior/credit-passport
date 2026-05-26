@@ -1,7 +1,5 @@
 package com.passport.creditpassport.lender.lenderservice;
 
-import com.passport.creditpassport.lender.lenderdto.CreditPassportRequest;
-import com.passport.creditpassport.lender.lenderdto.CreditPassportResponse;
 import com.passport.creditpassport.lender.lenderdto.LenderRequest;
 import com.passport.creditpassport.lender.lenderdto.LenderResponse;
 

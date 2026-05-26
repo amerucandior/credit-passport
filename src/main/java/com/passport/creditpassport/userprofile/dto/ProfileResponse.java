@@ -1,7 +1,5 @@
 package com.passport.creditpassport.userprofile.dto;
 
-import com.passport.creditpassport.auth.AuthenticatedUserPrincipal;
-import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.userprofile.models.EmploymentStatus;
 import com.passport.creditpassport.userprofile.models.Gender;
 import com.passport.creditpassport.userprofile.models.UserProfile;

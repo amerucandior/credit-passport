@@ -1,6 +1,7 @@
 package com.passport.creditpassport.auth.serviceimplementation;
 
 import com.passport.creditpassport.auth.dto.AuthResponse;
+import com.passport.creditpassport.auth.dto.OtpPayload;
 import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpUtils;
@@ -30,11 +31,11 @@ public class LoginOtpImpl {
 
 
     /**
-     * Authenticates email + password, rejects unverified accounts,
+     * Authenticates email and password, rejects unverified accounts,
      * then generates and emails a login OTP. No JWT is issued here.
      */
     @Transactional
-    public void initiateLogin(String identifier, String password) {
+    public OtpPayload initiateLogin(String identifier, String password) {
         Authentication authentication = authServiceImpl.authenticate(
                 new UsernamePasswordAuthenticationToken(identifier, password)
         );
@@ -52,7 +53,7 @@ public class LoginOtpImpl {
         user.setLoginOtpExpiresAt(OtpUtils.expiryInstant(OTP_TTL));
         usersRepository.save(user);
 
-        emailService.sendOtpEmail(user.getEmail(), "Your login code", otpCode);
+        return new OtpPayload(user.getEmail(), otpCode);
     }
 
     /**

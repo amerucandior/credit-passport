@@ -5,6 +5,7 @@ import com.passport.creditpassport.auth.dto.RegisterRequest;
 import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.UsersRepository;
 import com.passport.creditpassport.auth.service.AuthService;
+import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.exception.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,7 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -30,6 +30,8 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
 
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+
 
     /**
      * Saves the new account. No JWT is issued — the account is disabled until
@@ -79,6 +81,11 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
     @Override
     public void initiateLogin(LoginRequest request) {
         authenticate(new UsernamePasswordAuthenticationToken(request.identifier(), request.userPassword()));
+    }
+
+    @Override
+    public void sendLoginEmailVerificationOtp(String email, String otpCode) {
+        emailService.sendOtpEmail(email, "Your login code", otpCode);
     }
 
     /**

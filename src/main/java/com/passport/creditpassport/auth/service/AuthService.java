@@ -23,4 +23,6 @@ public interface AuthService {
      * The caller must invoke LoginOtpImpl.initiateLogin(email, password) next.
      */
     void initiateLogin(LoginRequest request);
+
+    void sendLoginEmailVerificationOtp(String email, String otpCode);
 }

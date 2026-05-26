@@ -1,14 +1,12 @@
 package com.passport.creditpassport.kyc.controller;
 
 import com.passport.creditpassport.auth.AuthenticatedUserPrincipal;
-import com.passport.creditpassport.kyc.dto.KycRequest;
 import com.passport.creditpassport.kyc.dto.KycResponse;
 import com.passport.creditpassport.kyc.enums.KycDocType;
 import com.passport.creditpassport.kyc.service.KycService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
