@@ -1,7 +1,6 @@
 package com.passport.creditpassport.kyc.repository;
 
 import com.passport.creditpassport.kyc.model.KYC;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -2,7 +2,6 @@ package com.passport.creditpassport.statement.controller;
 
 import com.passport.creditpassport.auth.AuthenticatedUserPrincipal;
 import com.passport.creditpassport.statement.dto.FinancialStatementResponse;
-import com.passport.creditpassport.statement.dto.UploadRequest;
 import com.passport.creditpassport.statement.enums.StatementType;
 import com.passport.creditpassport.statement.service.FinancialStatementService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +9,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

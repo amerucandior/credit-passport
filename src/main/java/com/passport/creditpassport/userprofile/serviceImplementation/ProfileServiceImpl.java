@@ -5,18 +5,13 @@ import com.passport.creditpassport.userprofile.dto.UpdateProfileRequest;
 import com.passport.creditpassport.userprofile.repository.ProfileRepository;
 import com.passport.creditpassport.userprofile.service.ProfileService;
 import com.passport.creditpassport.userprofile.models.UserProfile;
-import com.passport.creditpassport.exception.InvalidProfilePhotoUrlException;
 import com.passport.creditpassport.exception.ProfileAlreadyExistsException;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
-import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 @Slf4j
 @Service
