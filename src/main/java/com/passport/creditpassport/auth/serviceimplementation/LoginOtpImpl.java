@@ -79,7 +79,7 @@ public class LoginOtpImpl {
         user.setLoginOtpExpiresAt(null);
         usersRepository.save(user);
 
-        String token = jwtService.generateToken(user.getId(), user.getNatId(), user.getName(), user.getEmail(), user.getNumber());
+        String token = jwtService.generateToken(user.getId(), user.getNatId(), user.getName(), user.getEmail(), user.getNumber(), user.getUserType().name());
         log.info("Login successful for user {} email {}", user.getName(), user.getEmail());
 
         return AuthResponse.builder().token(token).build();

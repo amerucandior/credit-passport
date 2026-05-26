@@ -33,7 +33,7 @@ public class JwtService {
      *               UUIDs are stable; names and national IDs can change.
      *               The filter uses this value to call usersRepository.findById().
      */
-    public String generateToken(String userId, String natId, String name, String number, String email) {
+    public String generateToken(String userId, String natId, String name, String number, String email, String role) {
         Date now    = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
@@ -43,6 +43,7 @@ public class JwtService {
                 .claim("name", name)
                 .claim("number", number)
                 .claim("email", email)
+                .claim("role", role)
                 .issuer(JWT_ISSUER)
                 .issuedAt(now)
                 .expiration(expiry)
@@ -95,5 +96,8 @@ public class JwtService {
     }
     public String extractEmail(String token) {
         return extractClaims(token).get("email", String.class);
+    }
+    public String extractRole(String token) {
+        return extractClaims(token).get("role", String.class);
     }
 }

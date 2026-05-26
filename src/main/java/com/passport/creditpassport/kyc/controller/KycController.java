@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,7 @@ public class KycController {
     private final KycService kycService;
 
     @Operation(summary = "uploads a document for kyc")
+    @PreAuthorize("hasRole('BORROWER')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<KycResponse> kycDoc (
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
@@ -37,12 +39,14 @@ public class KycController {
     }
 
     @Operation(summary = "Get a KYC document by ID")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<KycResponse> getKyc(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
         return ResponseEntity.ok(kycService.getKycDoc(principal.id()));
     }
 
     @Operation(summary = "Delete a KYC document by ID")
+    @PreAuthorize("hasRole('BORROWER')")
     @DeleteMapping
     public ResponseEntity<Void> deleteKyc(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
         kycService.deleteKycDoc(principal.id());

@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Lender", description = "Lender registration endpoint")
@@ -35,6 +36,7 @@ public class LenderController {
 
     @Operation(summary = "Fetch credit passport by national ID for authenticated lender")
     @SecurityRequirement(name = "apiKeyAuth")
+    @PreAuthorize("hasRole('LENDER')")
     @PostMapping("/credit-passport")
     public ResponseEntity<CreditPassport> getCreditPassport( // todo: make modular
         @Valid @RequestBody CreditPassportRequest req,
@@ -56,6 +58,7 @@ public class LenderController {
 
     @Operation(summary = "Lender API health endpoint")
     @SecurityRequirement(name = "apiKeyAuth")
+    @PreAuthorize("hasRole('LENDER')")
     @GetMapping("/health")
     public ResponseEntity<Void> health() {
         return ResponseEntity.ok().build();

@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,7 @@ public class ProfileController {
             @ApiResponse(responseCode = "409", description = "Profile already exists for this user",
                     content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('BORROWER')")
     @PostMapping
     @SuppressWarnings("java:S5131") // XSS: Jackson serializes all string output as JSON-encoded — no raw HTML rendering
     public ResponseEntity<ProfileResponse> createProfile(
@@ -71,6 +73,7 @@ public class ProfileController {
             @ApiResponse(responseCode = "404", description = "Profile not found for authenticated user",
                     content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('BORROWER')")
     @GetMapping
     public ResponseEntity<ProfileResponse> getProfile(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
@@ -100,6 +103,7 @@ public class ProfileController {
             @ApiResponse(responseCode = "404", description = "Profile not found for authenticated user",
                     content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('BORROWER')")
     @PatchMapping
     public ResponseEntity<ProfileResponse> updateProfile(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
