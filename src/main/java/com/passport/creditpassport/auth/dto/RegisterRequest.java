@@ -11,8 +11,9 @@ public record RegisterRequest (
     @Size(min = 3, max = 50)
     String name,
 
-    @Schema(description = "Phone number", example = "0712345678")
+    @Schema(description = "Phone number", example = "+254712345678")
     @NotBlank(message = "Enter a valid phone number")
+    @Pattern(regexp = "^(\\+254|0)[17]\\d{8}$", message = "Enter a valid Kenyan phone number")
     String number,
 
     @Schema(description = "Password with at least 8 characters", example = "123@#$df")
