@@ -4,6 +4,9 @@ import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpUtils;
 import com.passport.creditpassport.auth.UsersRepository;
+import com.passport.creditpassport.exception.AccountAlreadyVerifiedException;
+import com.passport.creditpassport.exception.InvalidOtpException;
+import com.passport.creditpassport.exception.OtpExpiredException;
 import com.passport.creditpassport.exception.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +20,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class RegistrationOtpImpl {
 
-    private static final Duration OTP_TTL = Duration.ofMinutes(10);
+    private static final Duration OTP_TTL = Duration.ofMinutes(5);
 
     private final EmailService emailService;
     private final UsersRepository usersRepository;
@@ -56,7 +59,7 @@ public class RegistrationOtpImpl {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.isEnabled()) {
-            throw new IllegalStateException("Account is already verified.");
+            throw new AccountAlreadyVerifiedException("Account is already verified.");
         }
 
         sendRegistrationOtp(email);
@@ -70,8 +73,8 @@ public class RegistrationOtpImpl {
      * Verifies the OTP and enables the account on success.
      * Clears the OTP fields afterwards so they cannot be reused.
      *
-     * @throws IllegalStateException    if the account is already verified
-     * @throws IllegalArgumentException if the OTP is expired or incorrect
+     * @throws AccountAlreadyVerifiedException    if the account is already verified
+     * @throws InvalidOtpException if the OTP is expired or incorrect
      */
     @Transactional
     public void verifyRegistrationOtp(String email, String rawOtp) {
@@ -79,13 +82,13 @@ public class RegistrationOtpImpl {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.isEnabled()) {
-            throw new IllegalStateException("Account is already verified.");
+            throw new AccountAlreadyVerifiedException("Account is already verified.");
         }
         if (!OtpUtils.isValid(user.getRegistrationOtpExpiresAt())) {
-            throw new IllegalArgumentException("Registration OTP has expired.");
+            throw new OtpExpiredException("Registration OTP has expired.");
         }
         if (!OtpUtils.verifyOtp(rawOtp, user.getRegistrationOtp())) {
-            throw new IllegalArgumentException("Invalid registration OTP.");
+            throw new InvalidOtpException("Invalid registration OTP.");
         }
 
         user.setEnabled(true);

@@ -6,7 +6,7 @@ import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpUtils;
 import com.passport.creditpassport.auth.UsersRepository;
 import com.passport.creditpassport.auth.JwtService;
-import com.passport.creditpassport.exception.ResourceNotFoundException;
+import com.passport.creditpassport.exception.*;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class LoginOtpImpl {
         User user = (User) authentication.getPrincipal();
 
         if (!user.isEnabled()) {
-            throw new IllegalStateException("Account not verified. Complete email verification first.");
+            throw new AccountNotVerifiedException("Account not verified. Complete email verification first.");
         }
 
         String otpCode = OtpUtils.generateOtpCode();
@@ -60,7 +60,7 @@ public class LoginOtpImpl {
      * This is the only place in the codebase that calls JwtService.generateToken().
      *
      * @return AuthResponse containing the JWT
-     * @throws IllegalArgumentException if the OTP is expired or incorrect
+     * @throws InvalidOtpException if the OTP is expired or incorrect
      */
     @Transactional
     public AuthResponse verifyLoginOtp(String email, String otpCode) {
@@ -68,10 +68,10 @@ public class LoginOtpImpl {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!OtpUtils.isValid(user.getLoginOtpExpiresAt())) {
-            throw new IllegalArgumentException("Login OTP has expired.");
+            throw new OtpExpiredException("Login OTP has expired.");
         }
         if (!OtpUtils.verifyOtp(otpCode, user.getLoginOtp())) {
-            throw new IllegalArgumentException("Invalid login OTP.");
+            throw new InvalidOtpException("Invalid login OTP.");
         }
 
         // Clear OTP fields — one-time use only
