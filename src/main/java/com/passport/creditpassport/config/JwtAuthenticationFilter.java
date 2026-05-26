@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -54,6 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String name;
         final String number;
         final String email;
+        final String role;
 
         try {
             if (!jwtService.validateToken(token)) {
@@ -66,6 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             name   = jwtService.extractName(token);
             number = jwtService.extractNumber(token);
             email  = jwtService.extractEmail(token);
+            role   = jwtService.extractRole(token);
         } catch (Exception e) {
             log.debug("Could not process JWT: {}", e.getMessage());
             filterChain.doFilter(request, response);
@@ -90,11 +95,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 6. Build an authenticated token.
         //    Three-arg constructor → isAuthenticated() == true.
         //    credentials = null — password not needed after JWT validation.
+        List<GrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_" + role)
+        );
+
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(
                         new AuthenticatedUserPrincipal(userId, natId, name, email, number),
                         null,
-                        Collections.emptyList()
+                        authorities
                 );
 
         // 7. Attach IP and session metadata for audit logging.

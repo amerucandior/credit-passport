@@ -1,5 +1,6 @@
 package com.passport.creditpassport.lender.lendermodel;
 
+import com.passport.creditpassport.auth.UserType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,10 @@ public class Lender {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "lender_id")
     private String lenderId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type", nullable = false)
+    private UserType userType = UserType.LENDER;
 
     @Column(name = "lender_name")
     private String lenderName;

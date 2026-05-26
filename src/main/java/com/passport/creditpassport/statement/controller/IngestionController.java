@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ public class IngestionController {
     private final FinancialStatementService financialStatementService;
 
     @Operation(summary = "Upload a financial statement")
+    @PreAuthorize("hasRole('BORROWER')")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<FinancialStatementResponse> upload(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
@@ -47,6 +49,7 @@ public class IngestionController {
     }
 
     @Operation(summary = "Get a financial statement by ID")
+    @PreAuthorize("hasRole('BORROWER')")
     @GetMapping("/{id}")
     public ResponseEntity<FinancialStatementResponse> getById(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
@@ -55,6 +58,7 @@ public class IngestionController {
     }
 
     @Operation(summary = "List all financial statements for the authenticated user")
+    @PreAuthorize("hasRole('BORROWER')")
     @GetMapping
     public ResponseEntity<List<FinancialStatementResponse>> listMine(
             @AuthenticationPrincipal AuthenticatedUserPrincipal principal) {

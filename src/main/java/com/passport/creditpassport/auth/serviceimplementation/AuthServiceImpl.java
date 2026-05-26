@@ -6,6 +6,8 @@ import com.passport.creditpassport.auth.models.User;
 import com.passport.creditpassport.auth.UsersRepository;
 import com.passport.creditpassport.auth.service.AuthService;
 import com.passport.creditpassport.exception.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -97,6 +100,9 @@ public class AuthServiceImpl implements AuthService, AuthenticationManager {
             throw new BadCredentialsException("Invalid credentials");
         }
 
-        return new UsernamePasswordAuthenticationToken(found, null, Collections.emptyList());
+        List<GrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_" + found.getUserType().name())
+        );
+        return new UsernamePasswordAuthenticationToken(found, null, authorities);
     }
 }
