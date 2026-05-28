@@ -56,8 +56,20 @@ public class KYC {
     @Column(name = "latest_payslip")
     private String latestPayslip;
 
-    @Column(name = "cloudinary_public_id")
-    private String cloudinaryPublicId;
+    @Column(name = "selfie_public_id")
+    private String selfiePublicId;
+
+    @Column(name = "national_id_front_public_id")
+    private String nationalIdFrontPublicId;
+
+    @Column(name = "national_id_back_public_id")
+    private String nationalIdBackPublicId;
+
+    @Column(name = "kra_pin_public_id")
+    private String kraPinPublicId;
+
+    @Column(name = "latest_payslip_public_id")
+    private String latestPayslipPublicId;
 
     @CreationTimestamp
     @Column(updatable = false)

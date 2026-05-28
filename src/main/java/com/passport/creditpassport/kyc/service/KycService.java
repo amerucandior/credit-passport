@@ -6,6 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface KycService {
     KycResponse uploadKycDoc(String userId, MultipartFile file, KycDocType kycDocType);
-    void deleteKycDoc(String userId);
+    void deleteKycDoc(String userId, KycDocType kycDocType);
     KycResponse getKycDoc(String userId);
 }
