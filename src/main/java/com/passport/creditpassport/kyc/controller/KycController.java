@@ -37,17 +37,29 @@ public class KycController {
     }
 
     @Operation(summary = "Get a KYC document by ID")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('BORROWER')")
     @GetMapping
     public ResponseEntity<KycResponse> getKyc(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
         return ResponseEntity.ok(kycService.getKycDoc(principal.id()));
     }
 
-    @Operation(summary = "Delete a KYC document by ID")
+    @Operation(summary = "Delete a single KYC document")
+    @PreAuthorize("hasRole('BORROWER')")
+    @DeleteMapping("/doc")
+    public ResponseEntity<Void> deleteMyKycDoc(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam KycDocType kycDocType) {
+        kycService.deleteKycDoc(principal.id(), kycDocType);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Admin: delete a single KYC document by user")
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping
-    public ResponseEntity<Void> deleteKyc(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
-        kycService.deleteKycDoc(principal.id());
+    @DeleteMapping("/{userId}/doc")
+    public ResponseEntity<Void> deleteUserKycDoc(
+            @PathVariable String userId,
+            @RequestParam KycDocType kycDocType) {
+        kycService.deleteKycDoc(userId, kycDocType);
         return ResponseEntity.noContent().build();
     }
 }

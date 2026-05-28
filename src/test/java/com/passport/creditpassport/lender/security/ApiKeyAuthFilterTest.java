@@ -69,7 +69,7 @@ class ApiKeyAuthFilterTest {
         filter.doFilter(request, response, chain);
 
         assertThat(response.getStatus()).isEqualTo(401);
-        assertThat(response.getContentAsString()).isEqualTo("{\"error\":\"Invalid API key\"}");
+        assertThat(response.getContentAsString()).isEqualTo("{\"error\":\"Invalid API key or inactive API key\"}");
     }
 
     @Test
@@ -78,6 +78,7 @@ class ApiKeyAuthFilterTest {
         String hashedKey = ApiKeyUtil.hash(rawKey);
         Lender lender = new Lender();
         lender.setCbkLicenseNo("CBK-555");
+        lender.setEnabled(true);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/lender/data");
         request.addHeader("X-API-KEY", rawKey);

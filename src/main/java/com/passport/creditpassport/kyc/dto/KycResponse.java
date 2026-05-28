@@ -8,13 +8,23 @@ import java.time.Instant;
 public record KycResponse(
         String userId,
         boolean verified,
-        Instant createdAt
+        Instant createdAt,
+        String selfiePicture,
+        String nationalIdFront,
+        String nationalIdBack,
+        String kraPin,
+        String latestPayslip
 ) {
     public static KycResponse from(KYC kyc) {
         return new KycResponse(
                 kyc.getUserId(),
                 kyc.isVerified(),
-                kyc.getCreatedAt()
+                kyc.getCreatedAt(),
+                kyc.getSelfiePicture(),
+                kyc.getNationalIdFront(),
+                kyc.getNationalIdBack(),
+                kyc.getKraPin(),
+                kyc.getLatestPayslip()
         );
     }
 }

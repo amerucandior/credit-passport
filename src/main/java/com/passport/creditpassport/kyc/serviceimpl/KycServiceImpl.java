@@ -35,7 +35,7 @@ public class KycServiceImpl implements KycService {
         validateKycDocument(file);
 
         String publicId = "kyc_" + userId + "_doc_" + UuidCreator.getTimeOrderedEpoch();
-        String folder = FOLDER + "/" + userId;
+        String folder = FOLDER + "/" + kycDocType + userId;
 
         log.info("Uploading KYC document to folder {} for userID = {}", folder, userId);
         Map<String, Object> result = cloudinaryService.uploadFile(file, folder, publicId);
@@ -46,18 +46,32 @@ public class KycServiceImpl implements KycService {
                     .orElse(KYC.builder().userId(userId).build());
 
             switch (kycDocType) {
-                case SELFIE            -> kyc.setSelfiePicture(
+                case SELFIE            -> {
+                    kyc.setSelfiePicture(
                         cloudinaryService.generateSecureUrl(uploadedPublicId));
-                case NATIONAL_ID_FRONT -> kyc.setNationalIdFront(
+                    kyc.setSelfiePublicId(uploadedPublicId);
+                }
+                case NATIONAL_ID_FRONT -> {
+                    kyc.setNationalIdFront(
                         cloudinaryService.generateSecureUrl(uploadedPublicId));
-                case NATIONAL_ID_BACK  -> kyc.setNationalIdBack(
+                    kyc.setNationalIdFrontPublicId(uploadedPublicId);
+                }
+                case NATIONAL_ID_BACK  -> {
+                    kyc.setNationalIdBack(
                         cloudinaryService.generateSecureUrl(uploadedPublicId));
-                case KRA_PIN           -> kyc.setKraPin(
+                    kyc.setNationalIdBackPublicId(uploadedPublicId);
+                }
+                case KRA_PIN           -> {
+                    kyc.setKraPin(
                         cloudinaryService.generateSecureUrl(uploadedPublicId));
-                case PAYSLIP           -> kyc.setLatestPayslip(
+                    kyc.setKraPinPublicId(uploadedPublicId);
+                }
+                case PAYSLIP           -> {
+                    kyc.setLatestPayslip(
                         cloudinaryService.generateSecureUrl(uploadedPublicId));
+                    kyc.setLatestPayslipPublicId(uploadedPublicId);
+                }
             }
-            kyc.setCloudinaryPublicId(uploadedPublicId);
             kycRepository.save(kyc);
             log.info("Uploaded KYC {} for userID = {}", kycDocType, userId);
             return KycResponse.from(kyc);
@@ -72,12 +86,34 @@ public class KycServiceImpl implements KycService {
     }
 
     @Override
-    public void deleteKycDoc(String userId) {
+    @Transactional
+    public void deleteKycDoc(String userId, KycDocType kycDocType) {
         KYC kyc = kycRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("KYC document not found"));
 
-        cloudinaryService.deleteFile(kyc.getCloudinaryPublicId());
-        kycRepository.delete(kyc);
+        String publicId = switch (kycDocType) {
+            case SELFIE            -> kyc.getSelfiePublicId();
+            case NATIONAL_ID_FRONT -> kyc.getNationalIdFrontPublicId();
+            case NATIONAL_ID_BACK  -> kyc.getNationalIdBackPublicId();
+            case KRA_PIN           -> kyc.getKraPinPublicId();
+            case PAYSLIP           -> kyc.getLatestPayslipPublicId();
+        };
+
+        if (publicId == null) {
+            throw new ResourceNotFoundException(kycDocType + " has not been uploaded");
+        }
+
+        cloudinaryService.deleteFile(publicId);
+
+        switch (kycDocType) {
+            case SELFIE            -> { kyc.setSelfiePicture(null);    kyc.setSelfiePublicId(null); }
+            case NATIONAL_ID_FRONT -> { kyc.setNationalIdFront(null);  kyc.setNationalIdFrontPublicId(null); }
+            case NATIONAL_ID_BACK  -> { kyc.setNationalIdBack(null);   kyc.setNationalIdBackPublicId(null); }
+            case KRA_PIN           -> { kyc.setKraPin(null);           kyc.setKraPinPublicId(null); }
+            case PAYSLIP           -> { kyc.setLatestPayslip(null);    kyc.setLatestPayslipPublicId(null); }
+        }
+
+        kycRepository.save(kyc);
     }
 
     @Override
