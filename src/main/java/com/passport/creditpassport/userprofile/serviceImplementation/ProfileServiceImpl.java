@@ -1,5 +1,6 @@
 package com.passport.creditpassport.userprofile.serviceImplementation;
 
+import com.passport.creditpassport.service.CloudinaryService;
 import com.passport.creditpassport.userprofile.dto.ProfileResponse;
 import com.passport.creditpassport.userprofile.dto.UpdateProfileRequest;
 import com.passport.creditpassport.userprofile.repository.ProfileRepository;
@@ -12,13 +13,22 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService{
 
-    private final ProfileRepository profileRepository;
+    private static final long   MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024L;           // 5 MB
+    private static final Set<String> ALLOWED_MIME_TYPES =
+            Set.of("image/jpeg", "image/png", "image/webp");
+
+    private final ProfileRepository  profileRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     @Transactional
@@ -77,5 +87,45 @@ public class ProfileServiceImpl implements ProfileService{
         UserProfile saved = profileRepository.save(profile);
         log.info("Profile updated for userId {}", userId);
         return ProfileResponse.fromEntity(saved, name, email, number, natId);
+    }
+
+    @Override
+    @Transactional
+    public ProfileResponse uploadProfilePhoto(String userId, String name, String email,
+                                              String number, String natId,
+                                              MultipartFile file) {
+        validateImageFile(file);
+
+        UserProfile profile = profileRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Profile not found — create one first."));
+
+        Map<String, Object> uploadResult = cloudinaryService.uploadFile(
+                file,
+                "credit-passport/profile-photos",
+                userId                          // deterministic publicId → overwrite is idempotent
+        );
+
+        String secureUrl = (String) uploadResult.get("secure_url");
+        profile.setProfilePhotoUrl(secureUrl);
+
+        UserProfile saved = profileRepository.save(profile);
+        log.info("Profile photo uploaded for userId {}", userId);
+        return ProfileResponse.fromEntity(saved, name, email, number, natId);
+    }
+
+    private static void validateImageFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Photo file must not be empty.");
+        }
+        String mime = file.getContentType();
+        if (mime == null || !ALLOWED_MIME_TYPES.contains(mime)) {
+            throw new IllegalArgumentException(
+                    "Unsupported file type. Allowed: JPEG, PNG, WebP.");
+        }
+        if (file.getSize() > MAX_PHOTO_SIZE_BYTES) {
+            throw new IllegalArgumentException(
+                    "File exceeds 5 MB limit.");
+        }
     }
 }
