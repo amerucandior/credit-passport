@@ -15,10 +15,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Profile", description = "User profile management")
 @SecurityRequirement(name = "bearerAuth")       // tells Swagger this endpoint needs a JWT
@@ -115,5 +117,33 @@ public class ProfileController {
                 principal.number(),
                 principal.natId(),
                 request));
+    }
+
+    @Operation(summary = "Upload your profile photo")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Photo uploaded successfully",
+                    content = @Content(schema = @Schema(implementation = ProfileResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid file (wrong type, too large, or empty)",
+                    content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Missing or invalid JWT token",
+                    content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Not authorised for this resource",
+                    content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Profile not found for authenticated user",
+                    content = @Content(schema = @Schema(implementation = GlobalExceptionHandler.ApiErrorResponse.class)))
+    })
+    @PreAuthorize("hasRole('BORROWER')")
+    @PostMapping(value = "/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProfileResponse> uploadProfilePhoto(
+            @AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+            @RequestParam("file") MultipartFile file) {
+        ProfileResponse response = profileService.uploadProfilePhoto(
+                principal.id(),
+                principal.name(),
+                principal.email(),
+                principal.number(),
+                principal.natId(),
+                file);
+        return ResponseEntity.ok(response);
     }
 }
