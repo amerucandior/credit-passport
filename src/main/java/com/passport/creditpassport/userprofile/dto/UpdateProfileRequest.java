@@ -76,13 +76,7 @@ public record UpdateProfileRequest (
     @Digits(integer = 10, fraction = 2, message = "Monthly income must have at most 10 integer digits and 2 decimal places")
     BigDecimal monthlyIncomeKes,
 
-
-    @Schema(
-            description = "Publicly accessible URL of the user's profile photo",
-            example = "https://cdn.creditpassport.com/photos/user-abc123.jpg",
-            maxLength = 500,
-            format = "uri"
-    )
+    @Schema(hidden = true)
     @URL(message = "Profile photo must be a valid URL")
     @Size(max = 500, message = "Profile photo URL must not exceed 500 characters")
     String profilePhotoUrl

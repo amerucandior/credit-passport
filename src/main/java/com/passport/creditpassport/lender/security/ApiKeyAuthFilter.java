@@ -66,7 +66,7 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
         String hashedKey = ApiKeyUtil.hash(rawApiKey);
         Optional<Lender> lender = lenderRepository.findByApiKey(hashedKey);
 
-        if (lender.isEmpty()|| !lender.get().isEnabled()) {
+        if (lender.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Invalid API key or inactive API key\"}");

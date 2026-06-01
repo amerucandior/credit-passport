@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
+import java.util.Set;
 
 
 @Service
@@ -124,10 +125,20 @@ public class KycServiceImpl implements KycService {
                 .orElseThrow(() -> new ResourceNotFoundException("KYC not found for user: " + userId));
     }
 
+    private static final Set<String> ALLOWED_KYC_TYPES = Set.of(
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "application/pdf",
+            "application/octet-stream"
+            );
+
     private void validateKycDocument(MultipartFile file) {
         if (file == null || file.isEmpty())
             throw new InvalidFileException("File cannot be empty");
         if (file.getSize() > MAX_SIZE_BYTES)
             throw new InvalidFileException("File exceeds 5MB limit");
+        if (!ALLOWED_KYC_TYPES.contains(file.getContentType()))
+            throw new InvalidFileException("Unsupported file type");
     }
 }

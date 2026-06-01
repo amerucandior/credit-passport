@@ -5,8 +5,8 @@ import com.passport.creditpassport.auth.dto.LoginRequest;
 
 /**
  * Core auth contract.
- * register() → void   : saves the user only; OTP is sent by RegistrationOtpImpl
- * initiateLogin() → void : validates credentials and sends a login OTP
+ * register() → void: saves the user only; OTP is sent by RegistrationOtpImpl
+ * initiateLogin() → void: validates credentials and sends a login OTP
  * helper logic lives in OtpService (its own class).
  * JWT issuance lives exclusively in LoginOtpImpl.verifyLoginOtp().
  */

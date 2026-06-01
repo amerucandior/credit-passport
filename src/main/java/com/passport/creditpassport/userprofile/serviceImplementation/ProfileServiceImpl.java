@@ -54,7 +54,6 @@ public class ProfileServiceImpl implements ProfileService{
         userProfile.setOccupation(request.occupation());
         userProfile.setSaccoName(request.saccoName());
         userProfile.setMonthlyIncomeKes(request.monthlyIncomeKes());
-        userProfile.setProfilePhotoUrl(request.profilePhotoUrl());
         return userProfile;
     }
 
@@ -83,7 +82,6 @@ public class ProfileServiceImpl implements ProfileService{
         if (request.saccoName()       != null) profile.setSaccoName(request.saccoName());
         if (request.employmentStatus() != null) profile.setEmploymentStatus(request.employmentStatus());
         if (request.monthlyIncomeKes() != null) profile.setMonthlyIncomeKes(request.monthlyIncomeKes());
-        if (request.profilePhotoUrl() != null) profile.setProfilePhotoUrl(request.profilePhotoUrl());
         UserProfile saved = profileRepository.save(profile);
         log.info("Profile updated for userId {}", userId);
         return ProfileResponse.fromEntity(saved, name, email, number, natId);
