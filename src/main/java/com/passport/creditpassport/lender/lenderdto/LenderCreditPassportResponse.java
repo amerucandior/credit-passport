@@ -4,7 +4,6 @@ import com.passport.creditpassport.creditpassport.model.CreditPassport;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
-import java.util.UUID;
 
 /**
  * Lender credit passport view.

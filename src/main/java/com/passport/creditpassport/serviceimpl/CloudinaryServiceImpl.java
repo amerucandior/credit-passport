@@ -27,6 +27,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                     "folder", folder,
                     "public_id", publicId,
                     "resource_type", "auto",
+                    "type", "upload",                       // force only authenticated uploads
                     "overwrite", true,
                     "invalidate", true
             );

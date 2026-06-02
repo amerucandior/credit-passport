@@ -3,7 +3,6 @@ package com.passport.creditpassport.auth.serviceimplementation;
 import com.passport.creditpassport.auth.dto.AuthResponse;
 import com.passport.creditpassport.auth.dto.OtpPayload;
 import com.passport.creditpassport.auth.models.User;
-import com.passport.creditpassport.auth.service.EmailService;
 import com.passport.creditpassport.auth.service.OtpUtils;
 import com.passport.creditpassport.auth.UsersRepository;
 import com.passport.creditpassport.auth.JwtService;
@@ -25,7 +24,6 @@ public class LoginOtpImpl {
     private static final Duration OTP_TTL = Duration.ofMinutes(10);
 
     private final UsersRepository usersRepository;
-    private final EmailService emailService;
     private final AuthServiceImpl authServiceImpl;
     private final JwtService jwtService;
 

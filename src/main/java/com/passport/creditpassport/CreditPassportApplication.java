@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication // @Configuration + @EnableAutoConfiguration + @ComponentScan
 public class CreditPassportApplication {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(CreditPassportApplication.class, args);
     }
 

@@ -8,7 +8,7 @@ import lombok.*;
 
 public class OtpRequest {
 
-    public static record VerifyOtpRequest (
+    public record VerifyOtpRequest (
         @Schema(description = "Email address that received the OTP", example = "johndoe@example.com")
         @NotBlank
         @Email
@@ -25,7 +25,7 @@ public class OtpRequest {
      */
 
     @Builder
-    public static record EmailOnlyRequest (
+    public record EmailOnlyRequest (
 
         @Schema(description = "Email address for the unverified account", example = "johndoe@example.com")
         @NotBlank
