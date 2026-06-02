@@ -11,6 +11,7 @@ import com.passport.creditpassport.kyc.service.KycService;
 import com.passport.creditpassport.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -92,6 +93,21 @@ public class KycServiceImpl implements KycService {
         KYC kyc = kycRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("KYC document not found"));
 
+        String publicId = getPublicId(kycDocType, kyc);
+        cloudinaryService.deleteFile(publicId);
+
+        switch (kycDocType) {
+            case SELFIE            -> { kyc.setSelfiePicture(null);    kyc.setSelfiePublicId(null); }
+            case NATIONAL_ID_FRONT -> { kyc.setNationalIdFront(null);  kyc.setNationalIdFrontPublicId(null); }
+            case NATIONAL_ID_BACK  -> { kyc.setNationalIdBack(null);   kyc.setNationalIdBackPublicId(null); }
+            case KRA_PIN           -> { kyc.setKraPin(null);           kyc.setKraPinPublicId(null); }
+            case PAYSLIP           -> { kyc.setLatestPayslip(null);    kyc.setLatestPayslipPublicId(null); }
+        }
+        kycRepository.save(kyc);
+    }
+
+    @NonNull
+    private static String getPublicId(KycDocType kycDocType, KYC kyc) {
         String publicId = switch (kycDocType) {
             case SELFIE            -> kyc.getSelfiePublicId();
             case NATIONAL_ID_FRONT -> kyc.getNationalIdFrontPublicId();
@@ -103,18 +119,7 @@ public class KycServiceImpl implements KycService {
         if (publicId == null) {
             throw new ResourceNotFoundException(kycDocType + " has not been uploaded");
         }
-
-        cloudinaryService.deleteFile(publicId);
-
-        switch (kycDocType) {
-            case SELFIE            -> { kyc.setSelfiePicture(null);    kyc.setSelfiePublicId(null); }
-            case NATIONAL_ID_FRONT -> { kyc.setNationalIdFront(null);  kyc.setNationalIdFrontPublicId(null); }
-            case NATIONAL_ID_BACK  -> { kyc.setNationalIdBack(null);   kyc.setNationalIdBackPublicId(null); }
-            case KRA_PIN           -> { kyc.setKraPin(null);           kyc.setKraPinPublicId(null); }
-            case PAYSLIP           -> { kyc.setLatestPayslip(null);    kyc.setLatestPayslipPublicId(null); }
-        }
-
-        kycRepository.save(kyc);
+        return publicId;
     }
 
     @Override
