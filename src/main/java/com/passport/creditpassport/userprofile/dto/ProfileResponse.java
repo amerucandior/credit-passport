@@ -3,13 +3,13 @@ package com.passport.creditpassport.userprofile.dto;
 import com.passport.creditpassport.userprofile.models.EmploymentStatus;
 import com.passport.creditpassport.userprofile.models.Gender;
 import com.passport.creditpassport.userprofile.models.UserProfile;
-
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
-
+@Builder
 public record ProfileResponse(
         String profileId,
         String userId,
@@ -29,24 +29,24 @@ public record ProfileResponse(
         Instant updatedAt) {
 
     public static ProfileResponse fromEntity(UserProfile profile, String name, String email, String number, String natId) {
-        return new ProfileResponse(
-                profile.getProfileId(),
-                profile.getUserId(),
-                name,
-                number,
-                email,
-                natId,
-                profile.getDateOfBirth(),
-                profile.getGender(),
-                profile.getEmploymentStatus(),
-                profile.getEmployerName(),
-                profile.getOccupation(),
-                profile.getSaccoName(),
-                profile.getMonthlyIncomeKes(),
-                profile.getProfilePhotoUrl(),
-                profile.getCreatedAt(),
-                profile.getUpdatedAt()
-        );
+        return ProfileResponse.builder()
+                .profileId(profile.getProfileId())
+                .userId(profile.getUserId())
+                .name(name)
+                .email(email)
+                .number(number)
+                .natId(natId)
+                .dateOfBirth(profile.getDateOfBirth())
+                .gender(profile.getGender())
+                .employmentStatus(profile.getEmploymentStatus())
+                .employerName(profile.getEmployerName())
+                .occupation(profile.getOccupation())
+                .saccoName(profile.getSaccoName())
+                .monthlyIncomeKes(profile.getMonthlyIncomeKes())
+                .profilePhotoUrl(profile.getProfilePhotoUrl())
+                .createdAt(profile.getCreatedAt())
+                .updatedAt(profile.getUpdatedAt())
+                .build();
     }
 }
 
