@@ -9,8 +9,26 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
+  # Dummy host so JavaMailSender is auto-configured; it only connects on send.
+  mail:
+    host: localhost
+    port: 3025
+
   security:
     jwt:
       secret: test-secret-key-for-testing-only-must-be-at-least-32-bytes
       expiration-ms: 900000
       refresh-token-expiry-days: 2
+
+# Placeholder values for external services; tests never call them for real.
+app:
+  mail:
+    from: test@credit-passport.local
+  scoring:
+    base-url: http://localhost:8000
+    api-key: test-scoring-api-key
+  cloudinary:
+    cloudname: test-cloud
+    api-key: test-cloudinary-key
+    api-secret: test-cloudinary-secret
+    api-env-variable: cloudinary://test-cloudinary-key:test-cloudinary-secret@test-cloud
