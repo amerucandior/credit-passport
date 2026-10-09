@@ -25,10 +25,6 @@ public class ScoringServiceClient {
         this.apiKey = apiKey;
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
-                .requestInterceptor((request, body, execution) -> {
-                    log.info("Outgoing headers: {}", request.getHeaders());
-                    return execution.execute(request, body);
-                })
                 .build();
     }
 
